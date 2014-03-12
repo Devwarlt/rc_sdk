@@ -1,0 +1,302 @@
+<canvas id="ctx" width="1280" height="720" style="border:1px solid #000000;"></canvas><br>
+<input type="file" class="upload" onchange="readFiles(this.files)" multiple="" /><br>
+<br>
+Type: 
+<input type="button" value="Player" onclick="player.type = 'player'">
+<input type="button" value="Bullet" onclick="player.type = 'bullet'">
+<input type="button" value="Enemy" onclick="player.type = 'enemy'">
+
+<br>
+x <input type="number" id="x" value="1000" onchange="player.x = +this.value;"/><br>
+y <input type="number" id="y" value="1000" onchange="player.y = +this.value"/><br>
+acc <input type="number" id="acc" value="15" onchange="player.acc = +this.value"/><br>
+maxSpd <input type="number" id="maxSpd" value="15" onchange="player.maxSpd = +this.value"/><br>
+
+<script>
+/* Sprite */
+  
+var ctx = document.getElementById("ctx").getContext("2d"); 
+ctx.font = '20px Arial';
+
+Cst = {WIDTH:1280,HEIGHT:720};
+Db = {map:{}};
+List = {
+	map:{},
+	all:{bob:{
+		x:1000,
+		y:1000,
+		acc:3,
+		type:'player',
+		bumperBox:[{x:16,y:0},{x:0,y:16},{x:-16,y:0},{x:0,y:-16}],
+		map:null,	
+		spdX:0,
+		spdY:0,
+		pushed:{time:0,angle:0,magn:0},
+		bumper:[0,0,0,0],
+		moveInput:[0,0,0,0],
+		maxSpd:15,
+	}
+}};
+player = List.all.bob;
+
+setInterval(function(){
+	ctx.clearRect(0,0,1280,720);
+	
+	if(!player.map) return;
+	
+	Actor.loop.pushed(player);
+	Actor.loop.bumper(player);   //test if collision with map    
+	Actor.loop.fall(player);
+	Actor.loop.move(player);  	//move the actor
+		
+	Draw.map('b');
+	ctx.strokeStyle = 'grey';
+	ctx.fillRect(1280/2-16,720/2-16,32,32);
+	ctx.strokeRect(1280/2-16,720/2-16,32,32);
+	ctx.fillStyle = 'white';
+	ctx.fillText(player.type[0],1280/2-5,720/2+5);
+	ctx.fillStyle = 'black';
+	Draw.map('a'); 
+	
+},40);
+
+
+Collision = {};
+Collision.getPos = function(pt){
+	return {x:Math.floor(pt.x/32),y:Math.floor(pt.y/32)}
+}
+
+Collision.getSquareValue = function(pos,map,type){
+	var grid = Db.map[map].grid[type];
+	if(!grid[pos.y]) return null;
+	return grid[pos.y][pos.x];		//return if in a falling zone
+}
+
+Collision.PosMap = function(pos,map,type){	
+	var grid = Db.map[map].grid[type];
+	return !grid[pos.y] || !+grid[pos.y][pos.x];		//return 1 if collision
+}
+//###############
+Actor = {loop:{}};
+
+Actor.loop.bumper = function(mort){	//test collision with map
+	for(var i = 0 ; i < 4 ; i ++){
+		var pos = Collision.getPos({x:mort.x + mort.bumperBox[i].x,y:mort.y + mort.bumperBox[i].y});
+		mort.bumper[i] = Collision.PosMap(pos,mort.map,mort.type);
+	}
+}
+
+Actor.loop.move = function(mort){
+	if(mort.bumper[0]){mort.spdX = -Math.abs(mort.spdX*0.5) - 1;} 
+	if(mort.bumper[1]){mort.spdY = -Math.abs(mort.spdY*0.5) - 1;}
+	if(mort.bumper[2]){mort.spdX = Math.abs(mort.spdX*0.5) + 1;} 
+	if(mort.bumper[3]){mort.spdY = Math.abs(mort.spdY*0.5) + 1;} 
+	
+	if(mort.moveInput[0] && !mort.bumper[0] && mort.spdX < mort.maxSpd){mort.spdX += mort.acc;}
+	if(mort.moveInput[1] && !mort.bumper[1] && mort.spdY < mort.maxSpd){mort.spdY += mort.acc;}
+	if(mort.moveInput[2] && !mort.bumper[2] && mort.spdX > -mort.maxSpd){mort.spdX -= mort.acc;}
+	if(mort.moveInput[3] && !mort.bumper[3] && mort.spdY > -mort.maxSpd){mort.spdY -= mort.acc;}	
+	
+	mort.spdX *= 0.9;
+	mort.spdY *= 0.9;
+	
+	mort.x += mort.spdX;
+	mort.y += mort.spdY;
+}
+
+Actor.loop.pushed = function(mort){
+	var status = mort.pushed;
+	if(status.time > 0){ 
+		mort.spdX += Math.cos(status.angle)/180*Math.PI*status.magn;
+		mort.spdY += Math.sin(status.angle)/180*Math.PI*status.magn;
+		status.time--;
+	} 
+}
+
+Actor.loop.fall = function(mort){
+	var xy = {x: mort.x +mort.bumperBox[1].x,y:mort.y + mort.bumperBox[0].y};	//center of bumper
+	xy = Collision.getPos(xy);
+	var value = Collision.getSquareValue(xy,mort.map,'player');
+	
+	if(value === '4'){ Actor.fall(mort); return; }
+	if(value === '3'){ 
+		var angle = [
+			[270-45,270,270+45],
+			[180,0,0],
+			[90+45,90,90-45],
+		];
+	
+		dance:
+		for(var i = -1 ; i < 2 ; i++){
+			for(var j = -1 ; j < 2 ; j++){
+				if(Collision.getSquareValue({x:xy.x+j,y:xy.y+i},mort.map,'player') === '4'){
+					mort.pushed = {time:1,magn:5,angle:angle[i+1][j+1]};
+					break dance;
+				}
+			}
+		}
+	}
+}
+
+Actor.fall = function(mort){
+	mort.x = 1000;
+	mort.y = 1000;
+}
+
+
+
+
+Draw = {};
+Draw.map = function (layer){
+	var SIZEFACT = 2;	//image is x2 smaller than ingame
+
+	var map = List.map[player.map];
+	//var mapX = Math.floor((player.x-1024)/2048).mm(0,map.img[layer].length-1);
+	//var mapY = Math.floor((player.y-1024)/2048).mm(0,map.img[layer][mapX].length-1);
+	
+	var mapX = Math.min(Math.max(Math.floor((player.x-1024)/2048),0),map.img[layer].length-1);
+	var mapY = Math.min(Math.max(Math.floor((player.y-1024)/2048),0),map.img[layer][mapX].length-1);
+	
+	
+	var mapXY = map.img[layer][mapX][mapY];
+	var pX = player.x-mapX*2048;
+	var pY = player.y-mapY*2048;
+	
+	var numX = (pX - Cst.WIDTH/2)/SIZEFACT ;
+	var numY = (pY - Cst.HEIGHT/2)/SIZEFACT ;
+	var longueur = Cst.WIDTH/2;
+	var hauteur = Cst.HEIGHT/2;
+	var diffX = numX + longueur - mapXY.width;
+	var diffY = numY + hauteur - mapXY.height;
+	var startX = Math.max(numX,0);
+	var startY = Math.max(numY,0);
+	var endX = Math.min(numX + longueur,mapXY.width)
+	var endY = Math.min(numY + hauteur,mapXY.height)
+	var tailleX = Math.min(endX-startX,mapXY.width);
+	var tailleY = Math.min(endY-startY,mapXY.height);
+	
+	ctx.drawImage(mapXY, startX,startY,tailleX,tailleY,(startX-numX)*SIZEFACT,(startY-numY)*SIZEFACT,tailleX*SIZEFACT,tailleY*SIZEFACT);	
+}
+	
+	
+readFiles = function(files) {
+	for (var i in files) { //for multiple files          
+		(function(file) {
+			var reader = new FileReader();  
+			
+			reader.fileName = file.name;
+			if(file.type === "image/png"){
+				reader.onload = readFiles.image;
+				reader.readAsDataURL(file, "UTF-8");
+			}
+			
+		})(files[i]);
+	}
+	for (var i in files) { //for multiple files          
+		(function(file) {
+			var reader = new FileReader();  
+			
+			reader.fileName = file.name;
+			if(file.type === "text/plain" || file.type === "application/javascript"){
+				reader.onload = readFiles.script;
+				reader.readAsText(file, "UTF-8");
+			}
+			
+		})(files[i]);
+	}	
+}
+
+readFiles.image = function(e) {  
+	var fullName = this.fileName.slice(0,this.fileName.indexOf('.'));
+	
+	var name = fullName.slice(0,fullName.indexOf('_')-1);
+	var layer = fullName[fullName.indexOf('_')-1].toLowerCase();
+	var x = fullName.slice(fullName.indexOf('_')+2,fullName.indexOf(','));
+	var y = fullName.slice(fullName.indexOf(',')+1,fullName.indexOf(')'));
+				
+	if(!List.map[name]) List.map[name] = {name:name,img:{'a':[],'b':[]}};
+	var m = List.map[name];
+	
+	var loadedImage = new Image();
+	loadedImage.src = this.result;
+	
+	if(!m.img[layer][x]) m.img[layer][x] = [];
+	m.img[layer][x][y] = loadedImage;
+	
+	player.map = Object.keys(List.map)[0];
+}
+
+
+readFiles.script = function(e) {  //unused
+	var name = this.fileName.slice(0,this.fileName.indexOf('.'));
+	
+	if(name === 'code'){
+		eval(e.target.result); 
+		console.log(Db.map);
+		var mapId = Object.keys(Db.map)[0];
+		Db.map[mapId] = Db.map[mapId]();
+		init(Db.map[mapId]);
+	}
+}
+
+
+init = function(map){
+	var strGrid = JSON.stringify(map.grid);
+	map.grid = {};
+	map.grid.player = JSON.parse(strGrid.replaceAll('0','a').replaceAll('1','0').replaceAll('2','0').replaceAll('a','1'));
+	map.grid.enemy = JSON.parse(strGrid.replaceAll('0','a').replaceAll('1','0').replaceAll('2','0').replaceAll('a','1').replaceAll('4','0'));
+	map.grid.bullet = JSON.parse(strGrid.replaceAll('0','a').replaceAll('1','0').replaceAll('2','1').replaceAll('a','1'));
+	
+	map.addon = map.addon || {};
+	return map;
+}
+
+
+Test = function(){
+	
+
+}
+
+
+Init = {db:{map:{baseMap:(function(){
+	return {
+		addon:{},
+		name : "No Name Map",
+		tileset : 'v1.1',
+		grid :[[]],
+		lvl:0,
+	}
+})}}};
+
+/* Input */
+Input = {};
+Input.event = {};
+Input.event.key = function(code,dir,event){
+	var num = dir === 'down' ? 1 : 0;
+	
+	if(code === 65) //a
+		player.moveInput[2] = num;
+	if(code === 83) //s
+		player.moveInput[1] = num;
+	if(code === 68) //d
+		player.moveInput[0] = num;
+	if(code === 87) //w
+		player.moveInput[3] = num;
+		
+}
+
+//Mouse Down/Up || Key Down/Up
+document.addEventListener('keyup', function(event) {	Input.event.key(event.keyCode,'up',event);});
+document.addEventListener('keydown', function(event) {	Input.event.key(event.keyCode,'down',event);});
+
+String.prototype.replaceAll = function (find, replace) {
+    return this.replace(new RegExp(find, 'g'), replace);
+};
+
+
+
+</script>
+
+
+
+
