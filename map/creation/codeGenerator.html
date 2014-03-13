@@ -1,0 +1,231 @@
+Select the .lua file (Not the .tmx file)<br>
+To get the .lua file (while project is opened on Tiled): <br>
+Tiled => Files => Export As... => Select Save as ".lua"<br>
+<br>
+<div id="log"></div>
+<input type="file" class="upload" onchange="readFiles(this.files)" multiple="" />
+<div id="show"></div>
+<script>
+log = function(txt){ document.getElementById('log').innerHTML += txt + '<br>'; }
+  
+
+String.prototype.replaceAll = function (find, replace) {
+    var str = this;
+    return str.replace(new RegExp(find, 'g'), replace);
+};
+
+String.prototype.numberOnly = function(num){
+	var sign = this[0] === '-';
+	var a = this.replace(/[^\d.]/g, "");
+	if(sign) a = '-' + a;
+	if(num){ a = +a; }
+	return a;
+}
+String.prototype.capitalize = function() {
+	return this.charAt(0).toUpperCase() + this.slice(1);
+}
+
+
+readFiles = function(files) {
+	for (var i in files) { //for multiple files          
+		(function(file) {
+			var reader = new FileReader();  
+			
+			reader.fileName = file.name;
+			reader.onload = readFiles.script;
+			reader.readAsText(file, "UTF-8");
+			
+			
+		})(files[i]);
+	}
+}
+
+
+
+readFiles.script = function(e) {  
+	if(this.fileName.indexOf('.tmx') !== -1){
+		log('You need to load the .lua file, not the .tmx file.');
+	}
+	var name = this.fileName.slice(0,this.fileName.indexOf('.'));
+	var content = e.target.result; 	
+	content = content.replaceAll('properties = {},','');
+	
+	
+	//get collision
+	var pos = content.indexOf('name = "COLLISION",');
+	while(content[pos] !== '{') pos++;
+	var start = pos+1;
+	while(content[pos] !== '}') pos++;
+	var end = pos;
+	
+	var collision = eval('['+content.slice(start,end)+']');
+	
+	//get zone
+	var pos = content.indexOf('name = "ZONE",');
+	while(content[pos] !== '{') pos++;
+	var start = pos+1;
+	while(content[pos] !== '}') pos++;
+	var end = pos;
+	
+	var zone = eval('['+content.slice(start,end)+']');
+	
+	
+	
+	//get height
+	var pos = content.indexOf('height = ');
+	var start = pos;
+	while(content[pos] !== ',') pos++;
+	var line = content.slice(start,pos);
+	height = line.numberOnly();
+	
+	//get width
+	width = collision.length/height;
+	
+	//
+	
+	var zoneData = zoneCrunch(zone);
+	var collisionData = collisionCrunch(collision);
+	
+	var str = '<pre>' +
+	'Db.map["' + name + '"] = function(){' + '<br>' +
+	'&#9;' + 'var m = Init.db.map.baseMap();' + '<br>' + 
+	'&#9;' + 'm.name = "' + name.capitalize() + '";' + '<br>' +
+	'&#9;' + 'm.tileset = "v1.1";' + '<br>' +
+	'&#9;' + 'm.grid = ' + collisionData.toString() + '<br>' +
+	'&#9;' + 'var a = m.addon.main = {};' + '<br>' +
+	'&#9;' + 'a.spot = ' + JSON.stringify(zoneData) + '<br>' +
+	'&#9;' + 'return m;' + '<br>' +
+	'}' + '</pre>;'
+
+	document.getElementById('show').innerHTML = str;
+}
+
+
+
+convertChart = {
+	'20001':'1',	//collision actor + bullet
+	'20051':'2',	//collision actor
+	'20011':'3',	//collision fall about
+	'20061':'4',	//collision fall
+	
+	'20101':'a',	//zone
+	'20102':'b',
+	'20103':'c',
+	'20104':'d',
+	'20105':'e',
+	'20106':'f',
+	'20107':'g',
+	'20108':'h',
+	'20151':'i',
+	'20152':'j',
+	'20153':'k',
+	'20154':'l',
+	'20155':'m',
+	'20156':'n',
+	'20157':'o',
+	'20158':'p',
+	
+	'20201':'q',
+	'20202':'r',
+	'20203':'s',
+	'20204':'t',
+	'20205':'u',
+	'20206':'v',
+	'20207':'w',
+	'20208':'x',
+}
+
+
+
+zone = {};
+
+
+
+function collisionCrunch(data){
+	for(var j = 0 ; j < height*width ;j++){
+		if(convertChart[data[j]]) data[j] = convertChart[data[j]];
+		else data[j] = 0;
+	}
+
+	//Make 2D array
+	var str = '["';
+	for(var j = 0 ; j < height ;j++){
+		for(var i = 0 ; i < width ; i++){
+			str += data[i+width*j];
+		}
+		str += '","';
+		//str += '",\n"';
+	}
+	str = str.slice(0,-2);
+	str += ']';
+	
+	return str;
+}
+
+function zoneCrunch(data){
+	for(var j = 0 ; j < height*width ;j++){
+		if(convertChart[data[j]]) data[j] = convertChart[data[j]];
+		else data[j] = 0;
+	}
+
+	//Make 2D array
+	var str = '["';
+	for(var j = 0 ; j < height ;j++){
+		for(var i = 0 ; i < width ; i++){
+			str += data[i+width*j];
+		}
+		str += '","';
+		//str += '",\n"';
+	}
+	str = str.slice(0,-2);
+	str += ']';
+
+	//Zone
+	array = JSON.parse(str);
+	for(var y = 0 ; y < array.length ;y++){
+		for(var x = 0 ; x < array[y].length ; x++){
+			if(array[y][x] == 0) continue;
+			var type = array[y][x];
+			if(!zone[type]){
+				zone[type] = {start:{x:x,y:y},count:0};
+			}
+			zone[type].end = {x:x,y:y};
+			zone[type].count++;
+		} 
+	}	
+
+
+	 
+	for(var i in zone){
+		//1 length => 1 pts
+		if(zone[i].start.x == zone[i].end.x &&	zone[i].start.y == zone[i].end.y){
+			zone[i] = {x:zone[i].start.x*32+16,y:zone[i].start.y*32+16};
+			continue;
+		}
+		if(zone[i].count === 2){
+			zone[i] = {x:(zone[i].start.x+zone[i].end.x)/2*32+16,y:(zone[i].start.y+zone[i].end.y)/2*32+16};
+			continue;
+		}
+		
+		//Zone
+		zone[i] = [zone[i].start.x*32,zone[i].end.x*32,zone[i].start.y*32,zone[i].end.y*32];
+	}
+
+	
+	return zone;
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+</script>
