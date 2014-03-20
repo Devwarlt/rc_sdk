@@ -1,13 +1,12 @@
 ####################################
 DIALOGUE:
 
-Definition:
+Definitions:
 	Npc: 	Who is talking. 		Ex: bob
-		Face:	Face of the NPC talking, referring to Db.dialogue.face.
+	Face:	Face appearing in the Chat Box when NPC talking (referring to Db.dialogue.face).
 	Convo: 	What is the topic. 		Ex: Giving Quest
 	Node: 	Each line of speech. 	Ex: Ask the player if he wants to help him
 	Option: List of choice given to the player for a specific node. Selecting an option will change the current node. Options can also trigger functions.
-	Face:	NImage used b
 	
 #################
 General Template:
@@ -43,7 +42,7 @@ Node Template:
 
 ## 2: Text with options (basic)
 
-'node0':{
+'node1':{
 	'text':"Hello, how are you?",
 	'option':[
 		{'text':"Great.",
@@ -96,17 +95,17 @@ Add Item:
 Remove Item:
 	Itemlist.remove(key,'itemId',amount);
 
-Testing if has item (return boolean):
+Test if the player has item (return boolean):
 	Itemlist.have(key,'itemId',amount);
 
 Give Exp:
 	Skill.addExp(key,'skill',amount);
 
-Completing Quest:
+Complete Quest:
 	Quest.complete(key,'questId');
 
 Change a Quest Variable:
-	List.main[key].quest['questId']['questVariable'] = new value;
+	List.main[key].quest['questId']['questVariable'] = value;
 
 Teleport a player:
 	Actor.teleport(key,x,y,'mapId');
@@ -121,15 +120,13 @@ Add text in Chat Box:
 ### Examples: ###
 
 function(key){
-	if(List.main[key].quest['QmyQuest'].killedDragon === false){
+	if(List.main[key].quest['QmyQuest']['killedDragon'] === false){
 		Chat.add(key,'You haven't killed the dragon yet');
 		
 		Actor.teleport(key,100,100,'dragonLair');
 		Itemlist.add(key,'fireEquipment',1);
-		
-		
 	}
-	if(List.main[key].quest['QmyQuest'].killedDragon === true){
+	if(List.main[key].quest['QmyQuest']['killedDragon'] === true){
 		Chat.add(key,'You have killed the dragon!');
 		Itemlist.remove(key,'fireEquipment',1);
 		

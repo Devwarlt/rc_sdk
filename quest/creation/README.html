@@ -16,6 +16,8 @@ This can include:
 -Map (Image, Grid, Events)
 -Enemy
 -Item
+
+
 -Equip
 -Ability
 -Plan
@@ -52,7 +54,7 @@ Each account has multiple variables separated in two categories: player and main
 
 Player contains the same variables than regular monsters. (Ex: hp, speed, attack, defence)
 
-Main contains variables that only "real players" have. (Ex: inventory, bank, preference)
+Main contains variables that only "human players" have. (Ex: inventory, bank, preference)
 The main also has the variable "quest" which track the current progression of all quests for a specify player.
 
 Account variables can be accessed via a unique id called "key". 
@@ -60,16 +62,19 @@ Account variables can be accessed via a unique id called "key".
 List.main[key] will access the main variables.
 List.actor[key] will access the player variables.
 
+Ex: List.actor[key].hp refers to the hp of the player corresponding to the key
+
 The key is always passed as the first parameter in any function you will create.
 
 ###
 
-There are 3 types of things that interacts with the player:
-1- Actor: Enemy, Npc, Switch, Block, Cuttable Trees, Doors 
-2- Attack: Bullet, Strike
-3- Drop: Items on the ground
+There are 3 types of entities that interacts with the player:
+1- Actor: 	Enemy, Player, Npc, Switch, Block, Cuttable Trees, Doors 
+2- Attack: 	Bullet, Strike
+3- Drop: 	Items on the ground
 
-Actors are the most important ones for quests.
+This guide focuses mostly on actors.
+
 
 ###
 In Javascript:

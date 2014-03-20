@@ -2,17 +2,16 @@ TODO:
 mapAddon
 Attack
 
-
-
 ####################################
 MAPS EVENTS:
 
-When creating quests, they are 5 interesting variables related to quests: lvl, hotspot, variable,  load, loop.
+When creating quests, they are 5 interesting variables related to quests: lvl, hotspot, variable, load, loop.
 
 ####
 .lvl: Number
-	The combat level of the monsters spawn in the area.
+	The combat level of the monsters that spawn in the area.
 
+####
 .hotspot: Object
 	Hotspot variable should be generated automatically via Tiled by adding letters from the Tileset 9 on the map on the ZONE layer.	Check /map/creation for more info.
 	
@@ -21,9 +20,7 @@ When creating quests, they are 5 interesting variables related to quests: lvl, h
 
 ####
 .variable: Object
-	Contains custom variables. Those can be anything. Each map has its own copy of variables.
-	If the map generates attacks, attack info should be a variable.
-	
+	Contains custom variables. Those can be any type. Each map has its own copy of variables.
 	
 ####
 .load: Function(String:map, Object:spot, Object:v, Object:m)
@@ -43,15 +40,14 @@ When creating quests, they are 5 interesting variables related to quests: lvl, h
 	m: 		complete map object
 
 	This function will be called every frame (25 times per second).
-	Used for: Test collision that will trigger another event. Generate attacks that doesn't come out of a enemy.
+	Used for: Test collision that will trigger another event.
 	
 ######################
 COMMON FUNCTIONS:
 
 Create Actor: (Enemy, Npc, Switch, Block, Cuttable Trees, Doors)
 	All actors have a specific template. When creating an actor, you need to specify the template to use.
-	Each template has a unique double id: category and variant.
-	Note: Custom actors made exclusively for a quest have their category set to the questId.
+	Each template has an id with 2 components: category and variant.
 	
 	In order to create an enemy that has different attribute than the template, you need to specify the differences in the "extra" parameter.
 	
@@ -74,12 +70,12 @@ Create Actor: (Enemy, Npc, Switch, Block, Cuttable Trees, Doors)
 		},					
 	});
 	
-	In other to create a enemy that can spawn, the enemy needs to be in a group. Note: The group be be only 1 enemy.
+	In other to create a enemy that can respawn, the enemy needs to be in a group. Note: The group be be only 1 enemy.
 	
 	Actor.creation.group(			//create a group of monsters that respawns
 		{
 			'xym':spot.a,	
-			'respawn':100			//frames before enemy group respawns. (timer starts when every members is dead)
+			'respawn':100			//amount of frames before enemy group respawns (timer starts when every members is dead)
 		},
 		[
 			{							//first enemy type of the group
@@ -89,7 +85,7 @@ Create Actor: (Enemy, Npc, Switch, Block, Cuttable Trees, Doors)
 				"extra":{},					//extra is applied to every monster of this type in that group
 			},
 			{							//second enemy type of the group
-				'amount':3,
+				'amount':2,
 				"category":"troll",
 				"variant":"fire",
 				"extra":{},	
@@ -105,7 +101,7 @@ Create Actor: (Enemy, Npc, Switch, Block, Cuttable Trees, Doors)
 	####
 	Dialogue: 
 		Can right-click to talkTo. used to trigger dialogues. Check README-dialogue for more info.
-		PARAM: key | mq: quest variable
+		PARAM: key | mq: quest variable (same as List.main[key])
 		
 		dialogue:function(key,mq){
 			if(mq.QmyQuest.dragonKilled === true){			
