@@ -47,9 +47,15 @@ readFiles.script = function(e) {
 		log('You need to load the .lua file, not the .tmx file.');
 	}
 	var name = this.fileName.slice(0,this.fileName.indexOf('.'));
+	
+	
 	var content = e.target.result; 	
 	content = content.replaceAll('properties = {},','');
 	
+	var version = content.indexOf("../../tileset/")
+	version = content.slice(version + 14,version + 14 + 4);
+	
+	convertChart = convertChart[version];
 	
 	//get collision
 	var pos = content.indexOf('name = "COLLISION",');
@@ -90,7 +96,7 @@ readFiles.script = function(e) {
 	'Db.map["' + name + '"] = function(){' + '<br>' +
 	'&#9;' + 'var m = Init.db.map.baseMap();' + '<br>' + 
 	'&#9;' + 'm.name = "' + name.capitalize() + '";' + '<br>' +
-	'&#9;' + 'm.tileset = "v1.1";' + '<br>' +
+	'&#9;' + 'm.tileset = ' + version + ';' + '<br>' +
 	'&#9;' + 'm.grid = ' + collisionData.toString() + '<br>' +
 	'&#9;' + 'var a = m.addon.main = {};' + '<br>' +
 	'&#9;' + 'a.spot = ' + JSON.stringify(zoneData) + '<br>' +
@@ -103,36 +109,39 @@ readFiles.script = function(e) {
 
 
 convertChart = {
-	'20001':'1',	//collision actor + bullet
-	'20051':'2',	//collision actor
-	'20011':'3',	//collision fall about
-	'20061':'4',	//collision fall
-	
-	'20101':'a',	//zone
-	'20102':'b',
-	'20103':'c',
-	'20104':'d',
-	'20105':'e',
-	'20106':'f',
-	'20107':'g',
-	'20108':'h',
-	'20151':'i',
-	'20152':'j',
-	'20153':'k',
-	'20154':'l',
-	'20155':'m',
-	'20156':'n',
-	'20157':'o',
-	'20158':'p',
-	
-	'20201':'q',
-	'20202':'r',
-	'20203':'s',
-	'20204':'t',
-	'20205':'u',
-	'20206':'v',
-	'20207':'w',
-	'20208':'x',
+	'v1.0':{'20001':'1','20051':'2','20011':'3','20061':'4','20101':'a','20102':'b','20103':'c','20104':'d','20105':'e','20106':'f','20107':'g','20108':'h','20151':'i','20152':'j','20153':'k','20154':'l','20155':'m','20156':'n','20157':'o','20158':'p','20201':'q','20202':'r','20203':'s','20204':'t','20205':'u','20206':'v','20207':'w','20208':'x',},
+	'v1.1':{
+		'20001':'1',	//collision actor + bullet
+		'20051':'2',	//collision actor
+		'20011':'3',	//collision fall about
+		'20061':'4',	//collision fall
+		
+		'20101':'a',	//zone
+		'20102':'b',
+		'20103':'c',
+		'20104':'d',
+		'20105':'e',
+		'20106':'f',
+		'20107':'g',
+		'20108':'h',
+		'20151':'i',
+		'20152':'j',
+		'20153':'k',
+		'20154':'l',
+		'20155':'m',
+		'20156':'n',
+		'20157':'o',
+		'20158':'p',
+		
+		'20201':'q',
+		'20202':'r',
+		'20203':'s',
+		'20204':'t',
+		'20205':'u',
+		'20206':'v',
+		'20207':'w',
+		'20208':'x',
+	},
 }
 
 
