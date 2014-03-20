@@ -1,0 +1,85 @@
+### Creating quest ####
+This guide is about creating map events (quests). 
+This guide assumes you already know how to create map images and collisions grid. Check /map/creation for that.
+This guide assumes you're using sprites/anim/icons already present in the game engine. 
+
+You can check quest example in the submissionExample folder. (RECOMMENDED)
+
+####################################
+PREPARATION: Install Nodejs server on your computer. Refer to /quest/preparation.
+
+####################################
+A quest submission must include everything needed in order for the quest to work.
+
+This can include:
+-Dialogue
+-Map (Image, Grid, Events)
+-Enemy
+-Item
+-Equip
+-Ability
+-Plan
+
+
+Submission must include:
+1- quest code (.js, file name is [yourQuestId].js) 
+2- map images (each map are in a separate folder. CHECK /map/creation for more info)
+3- info.js (general information ex: author/date)
+
+
+Video Link (HIGHLY RECOMMENDED): 
+
+
+####################################
+SUMMARY:
+
+-Game Engine Basics
+-Quest Template
+-Dialogue
+-Map Events
+-Enemy
+-Item
+
+Not common:
+-Equip
+-Ability
+-Plan
+
+####################################
+GAME ENGINE BASICS:
+
+Each account has multiple variables separated in two categories: player and main.
+
+Player contains the same variables than regular monsters. (Ex: hp, speed, attack, defence)
+
+Main contains variables that only "real players" have. (Ex: inventory, bank, preference)
+The main also has the variable "quest" which track the current progression of all quests for a specify player.
+
+Account variables can be accessed via a unique id called "key". 
+
+List.main[key] will access the main variables.
+List.actor[key] will access the player variables.
+
+The key is always passed as the first parameter in any function you will create.
+
+###
+
+There are 3 types of things that interacts with the player:
+1- Actor: Enemy, Npc, Switch, Block, Cuttable Trees, Doors 
+2- Attack: Bullet, Strike
+3- Drop: Items on the ground
+
+Actors are the most important ones for quests.
+
+###
+In Javascript:
+
+{attribute:value} is same than {'attribute':value} is same than {"attribute":value}
+"abc" is same than 'abc'
+object['attribute'] is same than object.attribute 
+//comments
+1/0 is infinity
+1 is same than true, 0 is same than false
+
+
+	

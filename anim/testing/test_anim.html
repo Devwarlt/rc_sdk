@@ -114,6 +114,13 @@ readFiles.image = function(e) {
 	loadedImage = new Image();
 	loadedImage.src = this.result;
 	loadedImage.id = name;
+	
+	if(Db.anim[name]){	//aka code loaded first
+		Db.anim[name].src = loadedImage;	//loaded from readFiles.image
+		Db.anim[name].name = loadedImage.id;
+		Db.anim[name].img = loadedImage;
+		Test();
+	}
 }
 
 
@@ -134,12 +141,12 @@ readFiles.script = function(e) {
 		anim.size = anim.size || 1;
 		anim.startY = anim.startY || 0;
 		
-		anim.src = loadedImage;	//loaded from readFiles.image
-		anim.name = loadedImage.id;
-		anim.img = loadedImage;
-		
-
-		Test();
+		if(typeof loadedImage !== 'undefined'){	//aka image loaded first
+			anim.src = loadedImage;	//loaded from readFiles.image
+			anim.name = loadedImage.id;
+			anim.img = loadedImage;
+			Test();
+		}
 	}
 }
 

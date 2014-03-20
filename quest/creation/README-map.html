@@ -1,0 +1,254 @@
+TODO:
+mapAddon
+Attack
+
+
+
+####################################
+MAPS EVENTS:
+
+When creating quests, they are 5 interesting variables related to quests: lvl, hotspot, variable,  load, loop.
+
+####
+.lvl: Number
+	The combat level of the monsters spawn in the area.
+
+.hotspot: Object
+	Hotspot variable should be generated automatically via Tiled by adding letters from the Tileset 9 on the map on the ZONE layer.	Check /map/creation for more info.
+	
+	Those hotspots can be accessed via the "spot.letter" variable.
+	Ex: spot.a 	will contain the x, y and mapId of the letter 'a' in the tile project. (Note: spot['a'] is the EXACT same thing than spot.a)
+
+####
+.variable: Object
+	Contains custom variables. Those can be anything. Each map has its own copy of variables.
+	If the map generates attacks, attack info should be a variable.
+	
+	
+####
+.load: Function(String:map, Object:spot, Object:v, Object:m)
+	map: 	complete mapId string
+	spot: 	the hotspot for that map
+	v:		map variables
+	m: 		complete map object
+	
+	This function will be called only once when initializing the map.
+	Used for: Create enemy, create npc, create switch, create block etc...
+
+####
+.loop Function(String:map, Object:spot, Object:v, Object:m)
+	map: 	complete mapId string
+	spot: 	the hotspot for that map
+	v:		map variables
+	m: 		complete map object
+
+	This function will be called every frame (25 times per second).
+	Used for: Test collision that will trigger another event. Generate attacks that doesn't come out of a enemy.
+	
+######################
+COMMON FUNCTIONS:
+
+Create Actor: (Enemy, Npc, Switch, Block, Cuttable Trees, Doors)
+	All actors have a specific template. When creating an actor, you need to specify the template to use.
+	Each template has a unique double id: category and variant.
+	Note: Custom actors made exclusively for a quest have their category set to the questId.
+	
+	In order to create an enemy that has different attribute than the template, you need to specify the differences in the "extra" parameter.
+	
+	## Basic Examples ##
+	Actor.creation({
+		'xym':spot.c,				//enemy will spawn where the 'c' is on the tile project
+		"category":"goblin",		//template used will be the goblin-red one (assuming the template exists)
+		"variant":"red",
+		"extra":{},					//enemy exactly the same than the template since extra is empty
+	});
+	
+	
+	Actor.creation({				
+		'xym':spot.c,				
+		"category":"goblin",		
+		"variant":"red",
+		"extra":{				//same enemy than above but this time, it has 9001 hp and moves slowly
+			hp:9001,
+			maxSpd:0.001,
+		},					
+	});
+	
+	In other to create a enemy that can spawn, the enemy needs to be in a group. Note: The group be be only 1 enemy.
+	
+	Actor.creation.group(			//create a group of monsters that respawns
+		{
+			'xym':spot.a,	
+			'respawn':100			//frames before enemy group respawns. (timer starts when every members is dead)
+		},
+		[
+			{							//first enemy type of the group
+				'amount':3,					//amount
+				"category":"troll",			//enemy category
+				"variant":"ice",			//enemy variant
+				"extra":{},					//extra is applied to every monster of this type in that group
+			},
+			{							//second enemy type of the group
+				'amount':3,
+				"category":"troll",
+				"variant":"fire",
+				"extra":{},	
+			},		
+		]
+	);
+	
+	#####################
+	## Extra Parameter ##
+	The extra parameter is used to allow the actors to do various stuff:
+		-Dialogue, act as chest, act as switch...
+			
+	####
+	Dialogue: 
+		Can right-click to talkTo. used to trigger dialogues. Check README-dialogue for more info.
+		PARAM: key | mq: quest variable
+		
+		dialogue:function(key,mq){
+			if(mq.QmyQuest.dragonKilled === true){			
+				Quest.complete(key,'QmyQuest');
+				Dialogue.start(key,{'group':'QmyQuest','npc':'Jenny','convo':'intro','node':'intro2'});
+			} else {
+				Dialogue.start(key,{'group':'QmyQuest','npc':'Jenny','convo':'intro','node':'intro0'});
+			}		
+		},
+	
+	####
+	Ability Cast on Death:
+		List of abilities the enemy will trigger when dying. abilities need to be known by enemy (be in .ability). if want only to be cast at death, put 0 chance to trigger for ai
+		
+		deathAbility:[		
+			'fireball',
+			'explosion',
+		],
+	
+	####
+	Function on Death (For Each killer):
+		Called for each player who dealt 1+ dmg to this monster when this monster dies
+		PARAM: key | mort: enemy who died object | map: mapId
+		
+		deathFunc:function(key,mort,map){},		
+	
+	####
+	Function on Death (Called once)
+		Called once whe monsters dies. killers is array of playerId. first id is guy who has the drop
+		PARAM: killers: array of player objects | mort: enemy who died object | map: mapId
+		
+		deathFuncArray:function(killers,mort,map){},	
+		
+	####
+	Delete On Death:
+		delete this enemy when he dies. 
+		
+		deleteOnceDead:true,
+	
+	####
+	Combat?
+		enemy in combat?
+		
+		combat:false,
+	
+	####
+	Condition to damage player
+		change condition so attacks will hit another actor. check Combat.hitIf
+		
+		hitIf:function(defObj,atkObj){
+			return 
+		},
+		hitIf:'enemy',		//can also be string and will refer to Combat.hitIf.list
+		
+	####
+	Condition to target player
+		test if defObj can be a target of the enemy.
+		
+		targetIf:		exact same than hitIf
+	
+	###
+	Function on Click
+		set a function to call when player click on the enemy. onclick info will be added to optionList automatically
+		do NOT use right click (reserved for optionList)
+		
+		onclick:{
+			'shiftLeft':{
+				'func':function(key,param0,param1...){},
+				'param':['param0','param1',...]		
+			},
+			'left':same,
+			'shiftRight':same,			
+		}
+		
+	####
+	Switch
+		an enemy that acts as a switch. REQ: enemy sprite needs to have anim:'off' and 'on'
+		
+		PARAM: key | mort: enemy being clicked object | map: map object
+		
+		switch:{		
+			on:function(key,mort,map){	//function when player activate the switch. map = map Obj
+				map.addon.Qtutorial.variable.rotation *= -1;		
+			},
+			off:function(key,mort,map){ //function when player desactivate the switch
+				map.addon.Qtutorial.variable.rotation *= -1;			
+			}
+			off:null		//once activated, the switch cant be desactivated.
+		}
+	
+	####
+	Chest
+		an enemy that acts as a chest. can only be opened once 
+		enemy needs to have anim:'open' and 'close'. 
+		
+		PARAM: key | eId: enemy id being clicked
+		RETURN: Boolean. True if it was succesful, false otherwise. (Ex: if enough inventory space)
+		
+		
+		chest:function(key,eId){
+			if(Itemlist.test(key,'gold',1000) === true){
+				Itemlist.add(key,'gold',1000);
+				return true;
+			} else {
+				return false;
+			}
+		} 
+	
+	#######	
+	Create Drop:
+		Drop.creation({			//create a drop on the ground
+			'xym':spot.o,
+			"item":"gold",		//itemId
+			"amount":1,			//item amount
+			'timer':1/0			//how long it will stay on the ground b4 dissappearing
+			
+			'viewedIf':[],		//array containing the key of all players who can pick the drop
+			'viewedIf':true,	//can be seen/picked by everyone
+		});
+
+###################		
+LOOP COMMON FUNCTIONS
+
+Everything in the loop function will be called every frame. 
+
+However, for performance reasons, it is adviced to use Loop.interval
+
+	Loop.interval(time)   return true every [time] frames.
+	
+Ex:
+if(Loop.interval(100)){		//do something... every 100 frames (every 4 seconds)
+	something...
+}
+	
+####
+Call Function if player is in a zone:
+	If a player is in that zone, call a function.
+	
+	PARAM: 	0: always put map,
+			1: hotspot zone. (ex: spot.a
+			2: actor type to trigger ('player' or 'enemy')
+			3: function to call
+			
+	Map.collisionRect(map,spot.a,'player',function(key){
+		List.actor[key].hp -= 100;		
+	});
