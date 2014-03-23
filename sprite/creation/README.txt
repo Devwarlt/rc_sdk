@@ -58,9 +58,7 @@ End Template
 
 id: 
 size: 	size factor (if size=1, change nothing)
-side: 	by default, the game engine assumes that from top to bottom, the character faces right (0), down (1), left (2), up (3)
-		if its not the case, you need to specify the side
-		ex: side = [1,2,3,0] means that from to top to bottom, image shows down (1), left (2), up (3), right (0)
+side: 	[rowWhereLookingRight,rowDown,rowLeft,rowUp]
 hpBar:  distance from center where hp bar should appear. negative number goes up
 legs:	distance from center where the foot are.   	
 preHitBox:    zone used for dmg collision.

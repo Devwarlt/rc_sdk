@@ -24,6 +24,10 @@
  <tileset firstgid="17501" name="8" tilewidth="16" tileheight="16">
   <image source="../../tileset/v1.1/8.png" width="800" height="800"/>
  </tileset>
+  </tileset>
+  <tileset firstgid="20000" name="9" tilewidth="16" tileheight="16">
+  <image source="../../tileset/v1.1/9.png" width="800" height="800"/>
+ </tileset>
  <layer name="ground 0" width="50" height="50">
   <data encoding="base64" compression="zlib">
    eJzt1TEKgDAQRNHcKXok9QA5jHpbt7QyjTqz4RcDvwgE8UFqKWWKzbGauJfYGtuS9x47YmfyVnvAFa6cW+0BV7hybrUHXOHKudUecIUr51Z7wNV/rtrDmfbyXV/+69ZZFle978jk6mm40rq6n8nkinfQy9Uo7yCucOVgA1d6D7jClXOrPeAKV86t9oArXDm32gOuxnR1ATl/27U=
