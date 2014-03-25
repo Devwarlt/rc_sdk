@@ -2,29 +2,39 @@
 DIALOGUE:
 
 Definitions:
-	Npc: 	Who is talking. 		Ex: bob
-	Face:	Face appearing in the Chat Box when NPC talking (referring to Db.dialogue.face).
-	Convo: 	What is the topic. 		Ex: Giving Quest
-	Node: 	Each line of speech. 	Ex: Ask the player if he wants to help him
-	Option: List of choice given to the player for a specific node. Selecting an option will change the current node. Options can also trigger functions.
+	Npc: 	Who is talking. 		
+		Ex: bob
+		
+	Face:	Face appearing in the Chat Box when NPC talking (referring to Db.dialogue.face).	
+		Ex: bobFace
+		
+	Convo: 	What is the topic. 		
+		Ex: Giving Quest
+		
+	Node: 	Each line of speech. 	
+		Ex: Ask the player if he wants to help him
+		
+	Option: List of choice given to the player for a specific node. 
+			Selecting an option will change the current node. 
+			Options can also trigger functions.
 	
 #################
 General Template:
 
-q.dialogue['npc'] = {'face':'faceId',
-	'convo0':{
-		'node0':{
+q.dialogue['npc'] = {face:'faceId',
+	convo0:{
+		node0:{
 			...
 		},
-		'node1':{
+		node1:{
 			...
 		},
-		'node2':{
+		node2:{
 			...
 		},
 	},
-	'convo1':{
-		'node0':{
+	convo1:{
+		node0:{
 			...
 		}
 	}
@@ -35,21 +45,21 @@ Node Template:
 
 ## 1: Only text (no option):
 
-'node0':{
-	'text':"Hello",
+node0:{
+	text':"Hello",
 },
 
 
 ## 2: Text with options (basic)
 
-'node1':{
-	'text':"Hello, how are you?",
-	'option':[
-		{'text':"Great.",
-			'next':{'node':'nextNode'},
+node1:{
+	text:"Hello, how are you?",
+	option:[
+		{text:"Great.",
+			next:{'node':'nextNode'},
 		},
-		{'text':"Bad.",
-			'next':{'node':'otherNextNode'}
+		{text:"Bad.",
+			next:{'node':'otherNextNode'}
 		},
 	]
 },
@@ -58,8 +68,8 @@ nextNode refers to the next node in the dialogue if the player chooses that opti
 It assumes you will stay in the same convo and the same npc.
 If you don't want that: 
 
-{'text':"Bad.",
-	'next':{'npc':'nextNpc,'convo':'nextConvo','node':'nextNode'}
+{text:"Bad.",
+	next:{npc:'nextNpc',convo:'nextConvo',node:'nextNode'}
 },
 
 ## 3: Text with options with functions
@@ -120,18 +130,18 @@ Add text in Chat Box:
 ### Examples: ###
 
 function(key){
-	if(List.main[key].quest['QmyQuest']['killedDragon'] === false){
-		Chat.add(key,'You haven't killed the dragon yet');
+	if(List.main[key].quest['QmyQuest']['killedDragon'] === false){		//if player havent killed the dragon yet
+		Chat.add(key,'You haven't killed the dragon yet');				//display message
 		
-		Actor.teleport(key,100,100,'dragonLair');
-		Itemlist.add(key,'fireEquipment',1);
+		Actor.teleport(key,100,100,'dragonLair');						//teleport player in dragonLair
+		Itemlist.add(key,'fireEquipment',1);							//give him a fireEquipment
 	}
-	if(List.main[key].quest['QmyQuest']['killedDragon'] === true){
-		Chat.add(key,'You have killed the dragon!');
-		Itemlist.remove(key,'fireEquipment',1);
+	if(List.main[key].quest['QmyQuest']['killedDragon'] === true){		//if he has killed it
+		Chat.add(key,'You have killed the dragon!');					//display message
+		Itemlist.remove(key,'fireEquipment',1);							//remove equip
 		
-		Skill.addExp(key,'magic',100);
+		Skill.addExp(key,'magic',100);									//give him 100 exp magic
 		
-		Quest.complete(key,'QmyQuest');
+		Quest.complete(key,'QmyQuest');									//complete quest
 	}
 }

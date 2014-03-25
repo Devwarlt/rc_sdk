@@ -24,7 +24,6 @@
  <tileset firstgid="17501" name="8" tilewidth="16" tileheight="16">
   <image source="../../tileset/v1.1/8.png" width="800" height="800"/>
  </tileset>
-  </tileset>
   <tileset firstgid="20000" name="9" tilewidth="16" tileheight="16">
   <image source="../../tileset/v1.1/9.png" width="800" height="800"/>
  </tileset>
