@@ -67,12 +67,18 @@ readFiles.script = function(e) {
 			zoneData = zoneCrunch(content.layers[i].data);
 	}
 	
+	if(!collisionData || !zoneData){
+		log('The layer "ZONE" or the layer "COLLISION" is missing.');
+		return;
+	}
 	
 	
 	var str = '<pre>' +
 	'Db.map["' + name + '"] = function(){' + '<br>' +
 	'&#9;' + 'var m = Init.db.map.baseMap();' + '<br>' + 
 	'&#9;' + 'm.name = "' + name.capitalize() + '";' + '<br>' +
+	'&#9;' + 'm.graphic = "' + name + '";' + '<br>' +
+	'&#9;' + 'm.lvl = 0;' + '<br>' +
 	'&#9;' + 'm.tileset = "' + version + '";' + '<br>' +
 	'&#9;' + 'm.grid = ' + collisionData.toString() + '<br>' +
 	'&#9;' + 'var a = m.addon.main = {};' + '<br>' +
@@ -100,6 +106,7 @@ convertChart = {
 		'20106':'f',
 		'20107':'g',
 		'20108':'h',
+		
 		'20151':'i',
 		'20152':'j',
 		'20153':'k',
@@ -117,6 +124,35 @@ convertChart = {
 		'20206':'v',
 		'20207':'w',
 		'20208':'x',
+		
+		
+		
+		'20251':'A',
+		'20252':'B',
+		'20253':'C',
+		'20254':'D',
+		'20255':'E',
+		'20256':'F',
+		'20257':'G',
+		'20258':'H',
+		
+		'20301':'I',
+		'20302':'J',
+		'20303':'K',
+		'20304':'L',
+		'20305':'M',
+		'20306':'N',
+		'20307':'O',
+		'20308':'P',
+		
+		'20351':'Q',
+		'20352':'R',
+		'20353':'S',
+		'20354':'T',
+		'20355':'U',
+		'20356':'V',
+		'20357':'W',
+		'20358':'X',
 	}
 }
 

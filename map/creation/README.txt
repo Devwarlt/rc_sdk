@@ -17,7 +17,7 @@ Video Link (HIGHLY RECOMMENDED):
 ####################################
 LAYERS EXPLANATION:
 
-Recommended maximum size: 150x150.
+Recommended maximum size: 128x128.
 Always save in ".json", not in ".lua".
 
 
@@ -60,7 +60,7 @@ SUMMARY:
 2- Create the ZONE layer.
 3- Once map is done, save it in .tmx and in .json.
 4- You now need to make the ABOVE and COLLISION LAYER.
-	Drag collAboveGenerator.html into a new browser tab. (Ex: Google Chrome)
+	Drag automaticTiledCompletion.html into a new browser tab. (Ex: Google Chrome)
 	Load the .json and overwrite your .json file with the generated code.
 5- The generator is only a HELPER, you will still need to fix couple things (especially ladder and bridge).
 6- Add the Fall and Near Fall tiles to the COLLISION layer.

@@ -70,6 +70,13 @@ readFiles.script = function(e) {
 			aboveLayer = content.layers[i];
 	}
 	
+	if(!collisionLayer || !aboveLayer){
+		log('The layer "above" or the layer "COLLISION" is missing.');
+		return;
+	}
+		
+	
+	
 	for(var i in content.layers){
 		for(var j in content.layers[i].data){
 			var d = content.layers[i].data[j];
