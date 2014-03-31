@@ -1,10 +1,11 @@
 This generator will automatically generate the code.js file. It assumes you have already made the map entirely (COLLISION and ZONE layer done).<br>
 <br>
 Select the .json file (Not the .tmx file)<br>
-To get the .json file (while project is opened on Tiled): <br>
-Tiled => Files => Export As... => Select Save as ".json"<br>
 <br>
 <div id="log"></div>
+
+<input type="checkbox" name="quest" id="quest" value="quest">Related to Quest<br>
+
 <input type="file" class="upload" onchange="readFiles(this.files)" multiple="" />
 <div id="show"></div>
 <script>
@@ -53,7 +54,7 @@ readFiles.script = function(e) {
 	var content = JSON.parse(e.target.result); 	
 	
 	version = content.tilesets[0].image.slice(-10).slice(0,4);	//assumes tileset name is 1 digit
-	convertChart = convertChart[version];
+	convertChart = convertChartAll[version];
 	
 	//get height
 	height = content.height;
@@ -72,16 +73,19 @@ readFiles.script = function(e) {
 		return;
 	}
 	
-	
+	var q = document.getElementById("quest").checked;
 	var str = '<pre>' +
-	'Db.map["' + name + '"] = function(){' + '<br>' +
+	
+	(q ? 'q.map.' + name : 'Db.map["' + name + '"]') +
+	
+	' = function(){' + '<br>' +
 	'&#9;' + 'var m = Init.db.map.baseMap();' + '<br>' + 
 	'&#9;' + 'm.name = "' + name.capitalize() + '";' + '<br>' +
 	'&#9;' + 'm.graphic = "' + name + '";' + '<br>' +
 	'&#9;' + 'm.lvl = 0;' + '<br>' +
 	'&#9;' + 'm.tileset = "' + version + '";' + '<br>' +
 	'&#9;' + 'm.grid = ' + collisionData.toString() + '<br>' +
-	'&#9;' + 'var a = m.addon.main = {};' + '<br>' +
+	'&#9;' + 'var a = m.addon.' + (q ? 'YOURQUESTID' : 'main') + ' = {};' + '<br>' +
 	'&#9;' + 'a.spot = ' + JSON.stringify(zoneData) + '<br>' +
 	'&#9;' + 'return m;' + '<br>' +
 	'};' + '</pre>'
@@ -91,7 +95,7 @@ readFiles.script = function(e) {
 
 
 
-convertChart = {
+convertChartAll = {
 	'v1.1':{
 		'20001':'1',	//collision actor + bullet
 		'20051':'2',	//collision actor
@@ -218,7 +222,6 @@ function zoneCrunch(data){
 
 	 
 	for(var i in zone){
-		console.log(zone,zone[i]);
 		//1 length => 1 pts
 		if(zone[i].start.x == zone[i].end.x &&	zone[i].start.y == zone[i].end.y){
 			zone[i] = {x:zone[i].start.x*32+16,y:zone[i].start.y*32+16};
