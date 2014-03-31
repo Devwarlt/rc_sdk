@@ -11,6 +11,19 @@ div{	white-space:nowrap;		draggable:false;	readonly:readonly;	disabled:disabled;
 
 <input type="file" class="upload" onchange="readFiles(this.files)" multiple="" /><br>
 <div id="log"></div>
+<div id="dialogueList"></div>
+<br>
+<textarea id="questVar"></textarea>
+<br>
+<button onclick="setQuestVar();">Set Quest Variables to what this textbox has</button>
+<button onclick="updateQuestVar();">Show current Quest Variables</button>
+<br>
+<textarea id="inventoryVar"></textarea>
+<br>
+<button onclick="setInventoryVar();">Set Inventory to what this textbox has</button>
+<button onclick="updateInventoryVar();">Show current Inventory</button>
+
+<div> Current Dialogue: <span id="currentDialogue">None.</span> </div>
 <div  id="gameDiv" class='posAbs'>
 	<div id="canvasDiv" class='posAbs'>
 		<canvas id="ctx" width="600" height="200" style="border:1px solid #000000;"></canvas>
@@ -22,26 +35,8 @@ div{	white-space:nowrap;		draggable:false;	readonly:readonly;	disabled:disabled;
 </div>		
 
 
-
-
-<!--
-<br>
-Display: 
-<input type="button" value="Hp" onclick="Display.hp = !Display.hp">
-<input type="button" value="Legs" onclick="Display.legs = !Display.legs">
-<input type="button" value="Bumperbox" onclick="Display.bumperBox = !Display.bumperBox">
-<input type="button" value="Hitbox" onclick="Display.hitBox = !Display.hitBox">
-
-<div id="anim"></div>
-<br>
-x <input type="number" id="x" value="250" onchange="Test()"/><br>
-y <input type="number" id="y" value="150" onchange="Test()"/><br>
-spd/maxSpd <input type="number" id="spd" value="0.5" onchange="Test()"/><br>
-sizeMod <input type="number" id="sizeMod" value="1" onchange="Test()"/><br>
--->
-
 <script>
-log = function(txt){ document.getElementById('log').innerHTML += txt + '<br>'; }
+log = function(txt){ document.getElementById('log').innerHTML = txt + '<br>'; }
   
 html = {dialogue:{div:document.getElementById('dialogueBoxDiv'),text:document.getElementById('dialogueBoxText')}};
 ctx = document.getElementById("ctx").getContext("2d"); 
@@ -66,8 +61,9 @@ Db = {dialogue:{
 //main.dialogue = Db.dialogue.test
 
 }};
-List = {main:{'bob':{dialogue:{}}}};
+List = {main:{'bob':{dialogue:{},quest:{},invList:{}}}};
 main = List.main['bob'];
+key = 'bob';
 
 readFiles = function(files) {
 	for (var i in files) { //for multiple files          
@@ -84,47 +80,60 @@ readFiles = function(files) {
 
 readFiles.script = function(e) {  
 	var name = this.fileName.slice(0,this.fileName.indexOf('.'));
-	q = {dialogue:{}};
 	try {	var content = eval(e.target.result); 
 	} catch(err){
 		log('Problem with file ' + name + '. Check template to make sure everything fits. Special attention to commas and quotes.');
 	}
-	
-	
-	Db.dialogue.QUESTID = q.dialogue;
+	qt = q;
+	Db.dialogue[qt.id] = qt.dialogue;
 	Dialogue.init();
+	List.main.bob.quest[qt.id] = qt.variable;
 	
-	var str = 'Start Dialogue: <br>';
-	for(var i in Db.dialogue){	//i = group
-		if(i === 'face' || i === 'test') continue;
-		for(var j in Db.dialogue[i])	//j = npc
-			for(var k in Db.dialogue[i][j])	//k = convo
-				for(var m in Db.dialogue[i][j][k]){	//m = node
-					var id = "'" + i + "'," + "'" + j + "'," + "'" + k + "'," + "'" + m + "'";
-					str += '<br><span ' +
-					'onclick="selectDia(' + id + ');" ' +
-					'title="Start this dialogue" ' + 
-					'>' +
-					'<font size="4">Dialogue.start(key,{group:\"' + i + '\",npc:\"' + j + '\",convo:\"' + k  + '\",node:\"' + m + '\"});</font>' +
-					'</span>';
-				}
+	var str = '<br>Call Function: ';
+	for(var i in qt.func){	//i = group
+		str += '<br><span ' +
+			'onclick="callFunc(\'' + i + '\');" ' +
+			'title="Call this function" ' + 
+			'>' + i
+			'</span>';
 	}		
-	log(str);
-	
+	document.getElementById('dialogueList').innerHTML = str;
+	updateQuestVar();
+	updateInventoryVar();
 	
 };
-selectDia = function(i,j,k,m){
-	Dialogue.start('bob',{group:i, npc:j,convo:k,node:m});
+
+
+callFunc = function(id){
+	qt.func[id]('bob',List.main.bob.quest[qt.id]);
+	updateQuestVar();
+	updateInventoryVar();
 }
-	
-	
+updateQuestVar = function(){
+	document.getElementById('questVar').value = 'List.main[key].quest.' + qt.id + ' = ' + JSON.stringify(main.quest[qt.id]);
+}
+setQuestVar = function(){
+	try {
+		eval(document.getElementById('questVar').value);
+	} catch(err){ log("Problem with the quest variable. Make sure quotes and commas are correct."); }
+}
+updateInventoryVar = function(){
+	document.getElementById('inventoryVar').value = 'List.main[key].invList = ' + JSON.stringify(main.invList);
+}
+setInventoryVar = function(){
+	try {
+		eval(document.getElementById('inventoryVar').value);
+	} catch(err){ log("Problem with the inventory. Make sure quotes and commas are correct."); }
+}
+
+
 Img = {face:new Image()};
 Img.face.src = 'faceSheet.png';
 Draw = {chat:{}};
 Draw.chat.dialogue = function(){
 	var s = Draw.chat.constant();
 	var dia = main.dialogue;
-	if(!dia) return;
+	if(!dia){ Draw.setInnerHTML(html.dialogue.text,''); return;}
 	
 	if(dia.face){	s.numX += s.faceX;} 
 	if(dia.option){ var nY = s.y+s.h-10-dia.option.length*20; }	
@@ -221,12 +230,19 @@ Dialogue = {};
 
 Dialogue.start = function(key,d){
 	//start dialogue. also set start x and y to end dialogue if player walks away
-
+	
+	try{
 	var dia = Db.dialogue[d.group][d.npc][d.convo][d.node];
 	var main = List.main[key];
 	main.dialogue = dia;
 	
-	//if(dia.func) applyFunc.key(key,dia.func,dia.param);	
+	document.getElementById('currentDialogue').innerHTML = 'Dialogue.start(key,{group:\"' + d.group + '\",npc:\"' + d.npc + '\",convo:\"' + d.convo  + '\",node:\"' + d.node + '\"})';
+	if(dia.func) applyFunc.key(key,dia.func,[List.main[key].quest]);
+	}catch(err){
+		log("This dialogue doesn't exist : " + JSON.stringify(d));
+	}
+	updateQuestVar();
+	updateInventoryVar();
 }
 
 Dialogue.end = function(key){
@@ -241,6 +257,8 @@ Dialogue.option = function(key,option){
 	} else {
 		List.main[key].dialogue = '';
 	}
+	updateQuestVar();
+	updateInventoryVar();
 }
 
 Dialogue.init = function(){
@@ -283,6 +301,60 @@ Dialogue.init = function(){
 	}
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//Functions
+Quest = {};
+Quest.complete = function(key,name){
+	List.main[key].quest[name].complete = 1;
+	log("Quest " + name + "complete");
+}
+Quest.template = function(){ return {dialogue:{},npc:{},variable:{},func:{}}; };
+
+Itemlist = {};
+Itemlist.add = function(key,item,amount){
+	List.main[key].invList[item] = List.main[key].invList[item] || 0;
+	List.main[key].invList[item] += amount;
+	updateInventoryVar();
+}
+Itemlist.remove = function(key,item,amount){
+	List.main[key].invList[item] = List.main[key].invList[item] || 0;
+	List.main[key].invList[item] -= amount;
+	if(List.main[key].invList[item] <= 0) delete List.main[key].invList[item];
+	updateInventoryVar();
+}
+Itemlist.have = function(key,item,amount,info){
+	if(info === 'amount') List.main[key].invList[item] || 0;
+	return List.main[key].invList[item] > amount;
+}
+Chat = {};
+Chat.add = function(key,txt){	log(txt); }
+
+Actor = {};
+Actor.teleport = function(key,x,y,map){ log('x:' + x + ' y:' + y + ' map:' + map);}
+
+Skill = {};
+Skill.addExp = function(key,skill,amount){log('skill:' + skill + ' amount:' + amount); } ;
+
+
+applyFunc = function(func,param){
+	return func.apply(this, param);
+}
+applyFunc.key = function(key,func,param){
+	return applyFunc(func,[key].concat(param));
+}
 </script>
 
 

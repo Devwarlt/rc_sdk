@@ -1,0 +1,38 @@
+Copy-paste your item in the text box and press "Test Item in textbox".<br>
+The format used is the one used for quests:<br>
+<br>Ex:<br>
+q.item['ITEMID'] = {<br>
+&nbsp;&nbsp;&nbsp;name:"Gold",<br>
+&nbsp;&nbsp;&nbsp;...<br>
+}<br>
+<br>
+
+<div id="log"></div>
+<div id="option"></div>
+<textarea id="itemVar"></textarea>
+<br>
+<button onclick="setVar();">Test Item in textbox</button>
+
+<script>
+log = function(txt){ document.getElementById('log').innerHTML = txt + '<br>'; }
+
+setVar = function(){
+	q = {item:{}};
+	
+	try{
+		eval(document.getElementById('itemVar').value);
+		log("Success!");
+	} catch(err){ log("Problem with the item. Make sure quotes and commas are correct."); }
+	
+	var str = 'Options: <br>';
+	for(var i in q.item)
+		for(var j in q.item[i].option)
+			str += '-' + q.item[i].option[j].name + '<br>';
+	document.getElementById('option').innerHTML = str;
+}
+
+</script>
+
+
+
+
