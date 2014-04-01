@@ -92,9 +92,9 @@ readFiles.script = function(e) {
 	var str = '<br>Call Function: ';
 	for(var i in qt.func){	//i = group
 		str += '<br><span ' +
-			'onclick="callFunc(\'' + i + '\');" ' +
+			'onclick="console.log(1); callFunc(\'' + i + '\');" ' +
 			'title="Call this function" ' + 
-			'>' + i
+			'> - ' + i + 
 			'</span>';
 	}		
 	document.getElementById('dialogueList').innerHTML = str;

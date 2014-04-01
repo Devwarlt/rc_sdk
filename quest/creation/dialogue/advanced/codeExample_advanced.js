@@ -4,37 +4,36 @@ q.id = 'Qtestdialogue';
 
 q.variable = {
 	'talk':0,
-	'killedAll':0,
+	'killedDragon':0,
 };
 
 q.func = {
 	dialogue1:function(key){
-		if(List.main[key].quest.Qtestdialogue.talk)
-			Dialogue.start(key,{group:'Qtestdialogue',npc:'jenny',convo:'intro',node:'gratz'});
-		else 
-			Dialogue.start(key,{group:'Qtestdialogue',npc:'jenny',convo:'intro',node:'intro'});
+		var mq = List.main[key].quest.Qtestdialogue;
+		if(!mq.talk) Dialogue.start(key,{group:'Qtestdialogue',npc:'jenny',convo:'intro',node:'first'});
+		else if(mq.talk && !mq.killedDragon) Dialogue.start(key,{group:'Qtestdialogue',npc:'jenny',convo:'intro',node:'second'});
+		else Dialogue.start(key,{group:'Qtestdialogue',npc:'jenny',convo:'intro',node:'gratz'});
 	},	
-	
-	
-}
-
-
+	killedDragon:function(key){
+		List.main[key].quest.Qtestdialogue.killedDragon = 1;	
+	},
+	killedDragon22:function(key){
+		List.main[key].quest.Qtestdialogue.killedDragon = 1;	
+	}
+};
 
 q.dialogue['jenny'] = {'face':'Jenny',
 	'intro':{
-		'intro':{
-			'text':"If you manage to kill all the different types of monsters, I'll give you something special.",
+		'first':{
+			'text':"Go kill dragon.",
 			'func':function(key,mq){ mq.Qtestdialogue.talk = 1; },
-			'option':[
-				{'text':"Bee!"},
-			
-			]
 		},
+		'second':{
+			'text':"What you waiting for.",
+		},	
 		'gratz':{
-			'text':"Congratz! Choose your special power!",
-			'option':[
-				{'text':"Bee!",'func':function(key){ Itemlist.add(key,'gold',120); }},
-			]
+			'text':"Congratz!",
+			'func':function(key){ Itemlist.add(key,'gold',120); },
 		},	
 	}
 };

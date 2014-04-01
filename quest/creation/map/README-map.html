@@ -64,7 +64,7 @@ Create Actor: (Enemy, Npc, Switch, Block, Cuttable Trees, Doors)
 		'xym':spot.c,				
 		"category":"goblin",		
 		"variant":"red",
-		"extra":{				//same enemy than above but this time, it has 9001 hp and moves slowly
+		"extra":{				//same enemy than above EXCEPT that this only has 9001 hp and moves slowly
 			hp:9001,
 			maxSpd:0.001,
 		},					
@@ -114,12 +114,9 @@ Create Actor: (Enemy, Npc, Switch, Block, Cuttable Trees, Doors)
 	
 	####
 	Ability Cast on Death:
-		List of abilities the enemy will trigger when dying. abilities need to be known by enemy (be in .ability). if want only to be cast at death, put 0 chance to trigger for ai
+		List of abilities the enemy will trigger when dying (their index in the .ability attribute of the enemy - check Db.enemy to know what they are).
 		
-		deathAbility:[		
-			'fireball',
-			'explosion',
-		],
+		deathAbility:[0, 2],
 	
 	####
 	Function on Death (For Each killer):
@@ -130,7 +127,7 @@ Create Actor: (Enemy, Npc, Switch, Block, Cuttable Trees, Doors)
 	
 	####
 	Function on Death (Called once)
-		Called once whe monsters dies. killers is array of playerId. first id is guy who has the drop
+		Called once whe monsters dies. killers is array of playerId. first element is guy who has the enemy drop
 		PARAM: killers: array of player objects | mort: enemy who died object | map: mapId
 		
 		deathFuncArray:function(killers,mort,map){},	
@@ -244,7 +241,8 @@ Call Function if player is in a zone:
 			1: hotspot zone. (ex: spot.a
 			2: actor type to trigger ('player' or 'enemy')
 			3: function to call
-			
+	
+	ex:
 	Map.collisionRect(map,spot.a,'player',function(key){
 		List.actor[key].hp -= 100;		
 	});

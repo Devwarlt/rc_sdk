@@ -1,6 +1,6 @@
 STEPS:
-1- Ctrl + H:  Replace the old name picture by the new one. 
-2- Click on cropping 5x5.bat.
+1- Ctrl + H:  Replace the old name picture by the name of your image.
+2- Click on cropping.bat.
 3- Delete empty images.
 
-Note: You need to have installed ImageMagick first.
+Note: You need to have installed ImageMagick first. You also need to be on Windows.

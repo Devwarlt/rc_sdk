@@ -17,22 +17,26 @@ Video Link (HIGHLY RECOMMENDED):
 ####################################
 LAYERS EXPLANATION:
 
-Recommended maximum size: 128x128.
+Recommended maximum size: 150x150.
 Always save in ".json", not in ".lua".
 
 
 ### ABOVE & BELOW: ###
 The game needs 2 image sets to work. 
 The first is what appear BELOW the player (ex: ground), the other ABOVE layer is what appear above the player (ex: tree branches).
-To create most of the ABOVE layer, you will use the software collAboveGenerator.html.
+To create most of the ABOVE layer, you can use the software automaticTiledCompletion.html that will do most of the work for you.
 A easy way to create the ABOVE layers is to change the opacity of BELOW layers to 50%.
-When saving the ABOVE image, make sure to uncheck the BELOW layers and use setting "only include visible layers"
+You can use multiple layers to create the above image.
+When saving the ABOVE image, make sure to uncheck the all the layers appearing below the player and use setting "only include visible layers"
+
 
 ### COLLISION ###
 The game also needs a collision grid.
 One of the layer must be named COLLISION.
+To create most of the COLLISION layer, you can use the software automaticTiledCompletion.html that will do most of the work for you.
+
 ONLY use images from tileset 9 on the COLLISION layer.
-Use the top left image (next to Actor & Bullet) of the tileset 9 and place it everywhere the player and bullets can't walk on in the COLLISION layer
+Use the top left image (red square next to Actor & Bullet) of the tileset 9 and place it everywhere the player and bullets can't walk on in the COLLISION layer (ex:wall)
 You can also use the darker red image (next to Actor) to block player but allow bullets. (ex: water)
 Place Fall where player can fall.
 Place Fall Close around Fall squares. If player is over a Fall Close square, it will drag him into the hole. 
@@ -51,7 +55,7 @@ PREPARATION:
 1- Install Tiled via "install tiled.exe" file.
 The entire map creation process is done via this software.
 
-2- Open the template vX.X.tmx located in the template folder
+2- Open the template vX.X.tmx located in the template folder. (Ex: v1.1.tmx)
 
 ####################################
 SUMMARY:
@@ -74,10 +78,9 @@ At this point, all the layers should be all done.
 11- Uncheck BELOW layers and save the ABOVE layers as image via File => Save as image. 
 12- Compress the images with compress.exe
 13- Copy paste the images in the cropping folder.
-14- Edit the "cropping 10x10.bat" file to fit your map name.
-15- Run the .bat to crop the images.
-16- Delete empty/useless images.
-17- Test the map. (check README in testing folder)
+14- Edit the "cropping.bat" file to fit your map name. (Ctrl-H and replace all)
+15- Run cropping.bat to crop the images. Note: This will also generate the minimap image named mapidM.png.
+16- Test the map. (check README in testing folder)
 
 
 ####################################
@@ -89,21 +92,20 @@ Ctrl+C works
 ####################################
 CROPPING:
 The game engine can't handle large images.
-This means you will need to crop the large map image into smaller images of 2048x2048.
-To do that, use the "cropping 10x10.bat" file.
+This means you will need to crop the large map image into smaller images of 640x320.
+To do that, use the "cropping.bat" file.
 
 ####################################
 NAMING CONVENTION:
 
-name.tmx => project saved normally
-name.json => project saved in json
+name.json 	=> 		project saved in json (GOOD format)
+name.tmx 	=> 		project saved with default format (BAD format) dont save it that way.
 
-nameA.png => full layer above player
-nameB.png => full layer below player
+nameA.png 	=> 		entire map image Above player
+nameB.png 	=> 		entire map image Below player
 
-then use the cropping.bat for both nameA.png and nameB.png to create regions
-nameA_(0,0) =>	2048x2048 region in the top left corner of the screen, above the player
-
+nameA_(0,0) =>		640x320 region in the top left corner of the screen, Above the player	(generated via cropping.bat)
+nameM.png 	=> 		Minimap image x16 smaller than fullsize map								(generated via cropping.bat)
 
 
 
