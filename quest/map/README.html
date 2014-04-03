@@ -13,9 +13,10 @@ When creating quests, they are 5 interesting variables related to quests: lvl, h
 
 ####
 .hotspot: Object
+	List of position in the map.
 	Hotspot variable should be generated automatically via Tiled by adding letters from the Tileset 9 on the map on the ZONE layer.	Check /map/creation for more info.
 	
-	Those hotspots can be accessed via the "spot.letter" variable.
+	Those hotspots can be accessed via the "spot.[letter]" variable.
 	Ex: spot.a 	will contain the x, y and mapId of the letter 'a' in the tile project. (Note: spot['a'] is the EXACT same thing than spot.a)
 
 ####
@@ -29,7 +30,7 @@ When creating quests, they are 5 interesting variables related to quests: lvl, h
 	v:		map variables
 	m: 		complete map object
 	
-	This function will be called only once when initializing the map.
+	This function will be called once when initializing the map.
 	Used for: Create enemy, create npc, create switch, create block etc...
 
 ####
@@ -101,36 +102,72 @@ Create Actor: (Enemy, Npc, Switch, Block, Cuttable Trees, Doors)
 	####
 	Dialogue: 
 		Can right-click to talkTo. used to trigger dialogues. Check README-dialogue for more info.
-		PARAM: key | mq: quest variable (same as List.main[key])
+		PARAM: key
 		
-		dialogue:function(key,mq){
-			if(mq.QmyQuest.dragonKilled === true){			
-				Quest.complete(key,'QmyQuest');
-				Dialogue.start(key,{'group':'QmyQuest','npc':'Jenny','convo':'intro','node':'intro2'});
+		dialogue:q.event.myDialogue,
+		
+		
+		//Example where
+		q.event.myDialogue = function(key){
+			if(get(key,'haveKilledDragon') === true){
+				dialogue(key,'Jenny','intro','intro2');
 			} else {
-				Dialogue.start(key,{'group':'QmyQuest','npc':'Jenny','convo':'intro','node':'intro0'});
+				dialogue(key,'Jenny','intro','intro0');
 			}		
-		},
+		};
+		
+		
+	####
+	Function on Death (For Each killer):
+		Called for each player who dealt 1+ dmg to this monster when this monster dies
+		PARAM: key | act: enemy who died object | map: mapId
+		
+		deathFunc:q.event.dragonKilled,
+		
+		//Example where
+		q.event.dragonKilled = function(key,act,map){
+			set(key,'haveKilledDragon',true);
+		};		
+		
+	####
+	Switch
+		an enemy that acts as a switch. REQUIREMENT: enemy sprite needs to have anim:'off' and 'on'
+		
+		PARAM: key | act: enemy being clicked object | map: map object
+		
+		switch:{		
+			on:function(key,act,map){	//function when player activate the switch
+				map.addon.Qtutorial.variable.rotation *= -1;		
+			},
+			off:function(key,act,map){ //function when player desactivate the switch
+				map.addon.Qtutorial.variable.rotation *= -1;			
+			}
+		}
+			off:null		//once activated, the switch cant be desactivated.
+		
+	####
+	Chest
+		an enemy that acts as a chest. can only be opened once. 	REQUIREMENT: enemy sprite needs to have anim:'open' and 'close'. 
+		
+		PARAM: key | eId: enemy id being clicked
+		RETURN: Boolean. True if it was succesful, false otherwise. (Ex: if enough inventory space)
+		
+		chest:function(key,eId){
+			if(testItem(key,'gold',1000) === true){
+				addItem(key,'gold',1000);
+				return true;
+			} else {
+				return false;
+			}
+		} 
+		
 	
+		
 	####
 	Ability Cast on Death:
 		List of abilities the enemy will trigger when dying (their index in the .ability attribute of the enemy - check Db.enemy to know what they are).
 		
 		deathAbility:[0, 2],
-	
-	####
-	Function on Death (For Each killer):
-		Called for each player who dealt 1+ dmg to this monster when this monster dies
-		PARAM: key | mort: enemy who died object | map: mapId
-		
-		deathFunc:function(key,mort,map){},		
-	
-	####
-	Function on Death (Called once)
-		Called once whe monsters dies. killers is array of playerId. first element is guy who has the enemy drop
-		PARAM: killers: array of player objects | mort: enemy who died object | map: mapId
-		
-		deathFuncArray:function(killers,mort,map){},	
 		
 	####
 	Delete On Death:
@@ -146,10 +183,10 @@ Create Actor: (Enemy, Npc, Switch, Block, Cuttable Trees, Doors)
 	
 	####
 	Condition to damage player
-		change condition so attacks will hit another actor. check Combat.hitIf
+		change who can be damaged by the attacks made this actor. check Combat.hitIf
 		
 		hitIf:function(defObj,atkObj){
-			return 
+			return true if atkObj can damage defObj
 		},
 		hitIf:'enemy',		//can also be string and will refer to Combat.hitIf.list
 		
@@ -157,7 +194,9 @@ Create Actor: (Enemy, Npc, Switch, Block, Cuttable Trees, Doors)
 	Condition to target player
 		test if defObj can be a target of the enemy.
 		
-		targetIf:		exact same than hitIf
+		targetIf:function(defObj,atkObj){
+			return true if atkObj can target defObj
+		},	
 	
 	###
 	Function on Click
@@ -174,38 +213,12 @@ Create Actor: (Enemy, Npc, Switch, Block, Cuttable Trees, Doors)
 		}
 		
 	####
-	Switch
-		an enemy that acts as a switch. REQ: enemy sprite needs to have anim:'off' and 'on'
+	ADVANCED: Function on Death (Called once)
+		Called once whe monsters dies. killers is array of playerId. first element is guy who has the enemy drop
+		PARAM: killers: array of player objects | mort: enemy who died object | map: mapId
 		
-		PARAM: key | mort: enemy being clicked object | map: map object
-		
-		switch:{		
-			on:function(key,mort,map){	//function when player activate the switch. map = map Obj
-				map.addon.Qtutorial.variable.rotation *= -1;		
-			},
-			off:function(key,mort,map){ //function when player desactivate the switch
-				map.addon.Qtutorial.variable.rotation *= -1;			
-			}
-			off:null		//once activated, the switch cant be desactivated.
-		}
+		deathFuncArray:function(killers,mort,map){},		
 	
-	####
-	Chest
-		an enemy that acts as a chest. can only be opened once 
-		enemy needs to have anim:'open' and 'close'. 
-		
-		PARAM: key | eId: enemy id being clicked
-		RETURN: Boolean. True if it was succesful, false otherwise. (Ex: if enough inventory space)
-		
-		
-		chest:function(key,eId){
-			if(Itemlist.test(key,'gold',1000) === true){
-				Itemlist.add(key,'gold',1000);
-				return true;
-			} else {
-				return false;
-			}
-		} 
 	
 	#######	
 	Create Drop:
@@ -224,7 +237,7 @@ LOOP COMMON FUNCTIONS
 
 Everything in the loop function will be called every frame. 
 
-However, for performance reasons, it is adviced to use Loop.interval
+However, for performance reasons, it is advised to use Loop.interval
 
 	Loop.interval(time)   return true every [time] frames.
 	

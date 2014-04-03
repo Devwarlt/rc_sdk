@@ -1,0 +1,51 @@
+####################################
+ITEM TEMPLATE:
+
+All the items related to a quest must start with [questId]-.
+Items that do not start with that will be renamed.
+
+q.item['Qmyquest-gold'] = {  /* "[myQuestId]-gold" will be the item id*/
+	name:'Gold',				/*name of item*/
+	icon:'system.gold',			/*icon used check /client/js/img.js    */
+	stack:true,					/*only use 1 inventory slot*/
+	trade:true, 				/*can be traded	*/		
+	drop:true,					/*can be dropped*/
+	remove:false,				/*remove item when used*/
+	bank:true,					/*can be put in a bank*/
+	type:'item',				/*leave that way. do not touch*/
+	
+	option:[					/*option when right clicking*/
+		{
+			name:'Teleport',  				/*visible text for client*/
+			func:q.event.teleportPlayer			/*quest event*/
+		},
+		{
+			name:'Open Bank',
+			func:q.event.openBank
+		},
+		
+	]
+};
+
+q.item['Qmyquest-gold'] = {   	
+	name:'Gold',			
+	icon:'system.gold',	
+	stack:true,				
+	trade:true, 					
+	drop:true,				
+	remove:false,				
+	bank:true,				
+	type:'item',			
+	
+	option:[				
+		{
+			name:'Teleport',
+			func:q.event.teleportPlayer
+		},
+		{
+			name:'Open Bank',
+			func:q.event.openBank
+		},
+		
+	]
+};

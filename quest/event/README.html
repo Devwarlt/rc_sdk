@@ -1,0 +1,77 @@
+#### QUEST EVENT ####
+
+STEPS:
+
+1- Think of the quest events and write them down with their intermediate.
+2- Code the quest events with the functions below.
+3- Write the key dialogues.
+4- Test the quest via the test-event.html file.
+ONCE THE QUEST WORKS
+5- Create the key maps roughly.
+6- Add the intermediates.
+7- Create the key items.
+8- Test the quest via your nodejs server. (check quest/testing)
+ONCE THE QUEST WORKS
+9- Polish.
+	Add "useless" map decoration.
+	Add "useless" dialogue.
+	Add "useless" enemies.
+10- Test the final version of the quest.
+
+
+
+#####################
+FUNCTIONS:
+Those are the main functions you can use in your quest events:
+
+Get a Quest Variable:
+	get(key,'questVariableName');					Ex:		get(key,'haveKilledDragon');
+	
+Change a Quest Variable:
+	set(key,'questVariableName',value);				Ex: 	set(key,'haveKilledDragon',true);
+	
+Add Item:
+	addItem(key,'itemId',amount);					Ex: 	addItem(key,'gold',100);
+	
+Remove Item:
+	removeItem(key,'itemId',amount);				Ex: 	removeItem(key,'gold',10);
+
+Verify if the player has item (return boolean):		
+	haveItem(key,'itemId',amount);					Ex:		if(haveItem(key,'gold',5)){ ... };
+
+Test if the player has enough inventory space for the items (return boolean):		
+	testItem(key,'itemId',amount);					Ex:		if(testItem(key,'gold',5)){ ... };	
+	
+Teleport a player:
+	teleport(key,x,y,'mapId');						Ex:		teleport(key,1000,2000,'dragonLair');
+	
+Start a dialogue:
+	dialogue(key,'npcId','convoId','nodeId');		Ex:		dialogue(key,'villager','giveQuest','intro');
+	
+Add regular text in Chat Box:
+	chat(key,'text');								Ex:		chat(key,'This villager seems to need help.');
+
+
+
+
+
+
+
+### Examples: ###
+
+q.event.teleportDragonLair = function(key){
+	teleport(key,100,100,'dragonLair');							//teleport player in dragonLair
+	chat(key,'You have been teleport to the dragon lair.');		//display message
+	addItem(key,'fireShield',1);								//give him a fireShield
+	set(key,'insideDragonLair',true);							//set quest variable insideDragonLair to true.
+};
+
+
+
+
+
+
+
+
+
+

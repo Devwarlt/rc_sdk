@@ -23,7 +23,7 @@ div{	white-space:nowrap;		draggable:false;	readonly:readonly;	disabled:disabled;
 <button onclick="setInventoryVar();">Set Inventory to what this textbox has</button>
 <button onclick="updateInventoryVar();">Show current Inventory</button>
 
-<div> Current Dialogue: <span id="currentDialogue">None.</span> </div>
+<input onclick="Dialogue.end();"> End Dialogue Dialogue: </input>
 <div  id="gameDiv" class='posAbs'>
 	<div id="canvasDiv" class='posAbs'>
 		<canvas id="ctx" width="600" height="200" style="border:1px solid #000000;"></canvas>
@@ -85,17 +85,22 @@ readFiles.script = function(e) {
 		log('Problem with file ' + name + '. Check template to make sure everything fits. Special attention to commas and quotes.');
 	}
 	qt = q;
+	Q = qt.id;
 	Db.dialogue[qt.id] = qt.dialogue;
 	Dialogue.init();
+	qt.variable.complete = 0;
+	qt.variable.started = 0;
 	List.main.bob.quest[qt.id] = qt.variable;
 	
-	var str = '<br>Call Function: ';
-	for(var i in qt.func){	//i = group
+	var str = '<br>Call Quest Event: ';
+	for(var i in qt.event){
 		str += '<br><span ' +
 			'onclick="console.log(1); callFunc(\'' + i + '\');" ' +
 			'title="Call this function" ' + 
 			'> - ' + i + 
 			'</span>';
+		str += '(key,';
+		str += '<input id="QQQ' + i + '"></input>);';
 	}		
 	document.getElementById('dialogueList').innerHTML = str;
 	updateQuestVar();
@@ -105,24 +110,25 @@ readFiles.script = function(e) {
 
 
 callFunc = function(id){
-	qt.func[id]('bob',List.main.bob.quest[qt.id]);
+	var param = document.getElementById('QQQ' + id).value;
+	qt.func[id]('bob',eval(param));
 	updateQuestVar();
 	updateInventoryVar();
 }
 updateQuestVar = function(){
-	document.getElementById('questVar').value = 'List.main[key].quest.' + qt.id + ' = ' + JSON.stringify(main.quest[qt.id]);
+	document.getElementById('questVar').value = JSON.stringify(main.quest[qt.id]);
 }
 setQuestVar = function(){
 	try {
-		eval(document.getElementById('questVar').value);
+		List.main[key].quest[qt.id] = eval(document.getElementById('questVar').value);
 	} catch(err){ log("Problem with the quest variable. Make sure quotes and commas are correct."); }
 }
 updateInventoryVar = function(){
-	document.getElementById('inventoryVar').value = 'List.main[key].invList = ' + JSON.stringify(main.invList);
+	document.getElementById('inventoryVar').value = JSON.stringify(main.invList);
 }
 setInventoryVar = function(){
 	try {
-		eval(document.getElementById('inventoryVar').value);
+		List.main[key].invList = eval(document.getElementById('inventoryVar').value);
 	} catch(err){ log("Problem with the inventory. Make sure quotes and commas are correct."); }
 }
 
@@ -236,7 +242,6 @@ Dialogue.start = function(key,d){
 	var main = List.main[key];
 	main.dialogue = dia;
 	
-	document.getElementById('currentDialogue').innerHTML = 'Dialogue.start(key,{group:\"' + d.group + '\",npc:\"' + d.npc + '\",convo:\"' + d.convo  + '\",node:\"' + d.node + '\"})';
 	if(dia.func) applyFunc.key(key,dia.func,[List.main[key].quest]);
 	}catch(err){
 		log("This dialogue doesn't exist : " + JSON.stringify(d));
@@ -323,30 +328,27 @@ Quest.complete = function(key,name){
 }
 Quest.template = function(){ return {dialogue:{},npc:{},variable:{},func:{}}; };
 
-Itemlist = {};
-Itemlist.add = function(key,item,amount){
+addItem = function(key,item,amount){
 	List.main[key].invList[item] = List.main[key].invList[item] || 0;
 	List.main[key].invList[item] += amount;
 	updateInventoryVar();
 }
-Itemlist.remove = function(key,item,amount){
+removeItem = function(key,item,amount){
 	List.main[key].invList[item] = List.main[key].invList[item] || 0;
 	List.main[key].invList[item] -= amount;
 	if(List.main[key].invList[item] <= 0) delete List.main[key].invList[item];
 	updateInventoryVar();
 }
-Itemlist.have = function(key,item,amount,info){
+haveItem = function(key,item,amount,info){
 	if(info === 'amount') List.main[key].invList[item] || 0;
 	return List.main[key].invList[item] > amount;
 }
-Chat = {};
-Chat.add = function(key,txt){	log(txt); }
+testItem = function(){ log("cant test this with this tester"); return true; }
 
-Actor = {};
-Actor.teleport = function(key,x,y,map){ log('x:' + x + ' y:' + y + ' map:' + map);}
+chat = function(key,txt){	log(txt); }
 
-Skill = {};
-Skill.addExp = function(key,skill,amount){log('skill:' + skill + ' amount:' + amount); } ;
+teleport = function(key,x,y,map){ log('x:' + x + ' y:' + y + ' map:' + map);}
+
 
 
 applyFunc = function(func,param){
@@ -355,6 +357,35 @@ applyFunc = function(func,param){
 applyFunc.key = function(key,func,param){
 	return applyFunc(func,[key].concat(param));
 }
+
+
+
+
+//Eval
+var get = function(key,attr){
+	var mq = List.main[key].quest[qt.id];
+	var a = mq[attr];
+	return typeof a === 'object' ? deepClone(a) : a;	//prevent setting
+}
+
+var set = function(key,attr,attr2,value){
+	var mq = List.main[key].quest[qt.id];
+	mq.started = true;
+	if(value === undefined) mq[attr] = attr2;	//aka deep = 1
+	else mq[attr][attr2] = value;
+	
+	if(attr === 'complete' && attr2)	Quest.complete(key,Q);
+}
+
+var getAct = function(key){
+	return List.all[key];
+}
+
+var dialogue = function(key,npc,convo,node){
+	Dialogue.start(key,{group:qt.id,npc:npc,convo:convo,node:node});
+}
+
+
 </script>
 
 

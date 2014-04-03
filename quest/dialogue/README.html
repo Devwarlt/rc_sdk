@@ -1,0 +1,128 @@
+####################################
+DIALOGUE:
+
+All the dialogues are put inside a database. 
+In order for the game engine to know which dialogue you want to use, you will need to identify the dialogue you have created with couple elements:
+
+	1- Npc: 	Who is talking. 		
+			Ex: bob
+	
+	2- Convo: 	What is the topic. 		
+			Ex: Giving Quest
+		
+	3 - Node: 	Each line of speech. 	
+			Ex: Ask the player if he wants to help him
+
+
+Each node also has properties such as:
+
+	Text:	What message is showed to the player.
+			Ex: "Hello adventurers. How are you today?"
+					
+	Face:	Face appearing in the Chat Box when NPC talking (referring to Db.dialogue.face).	
+			Ex: bobFace
+				
+	Option: List of choice given to the player. 
+			Selecting an option will change the current dialogue. 
+			Options can also trigger custom functions that will be used when making quests. (Ex: give an item)
+	
+	Func:	Quest Event to call when player accesses this dialogue
+	
+Each option has the properties:
+
+	Text:	What is the text of the option
+			Ex: "I'm fine. Thanks for asking."
+	
+	Next:	Reference to the next dialogue to display if the player chooses this option.
+			Ex: {npc:'bob',convo:'introduction',node:'giveQuest'}
+	
+	Func:	Quest Event to call when player chooses this option
+			
+	
+#################
+General Template:
+
+q.dialogue['npcName'] = {
+	convo0:{
+		node0:{
+			...
+		},
+		node1:{
+			...
+		},
+		node2:{
+			...
+		},
+	},
+	convo1:{
+		node0:{
+			...
+		}
+	}
+};
+
+#################
+Node Template:
+
+## 1: Only text (no option):
+
+node0:{
+	text:"Hello",
+},
+
+
+## 2: Text with options and face (basic)
+
+node0:{
+	text:"Hello, how are you?",
+	face:'bobFace',
+	option:[
+		{text:"Great.",
+			next:{npc:'npcName',convo:'convo0',node:'node1'},
+		},
+		{text:"Bad.",
+			next:{npc:'npcName',convo:'convo0',node:'node2'}
+		},
+	]
+},
+
+
+If the player choose the first option, it will start the dialogue in the node1.
+If he chooses 2nd option, it will start node2.
+
+If you don't specify the npc or the convo, it assumes you will stay with same npc and same convo.
+Ex:			next:{node:'node1'},  
+
+If next is not defined at all, the dialogue ends.
+
+
+#############################
+#### Quest Events #####
+
+## 3: Text with options with quest events
+The param "func" contains the quest event to trigger if the player chooses that option.
+
+node0:{
+	text:"Would you like to be teleported to the dragon lair?",
+	option:[
+		{text:"Yes.",
+			func:q.event.teleportDragonLair
+		},
+		{text:"No."},
+	],
+},
+
+### 
+
+node0:{
+	text:"Hello, how are you?",
+	func:q.event.giveRing
+}
+
+Functions can also be directly linked with the node. (no options needed)
+
+
+
+	
+	
+

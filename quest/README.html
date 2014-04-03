@@ -1,0 +1,155 @@
+### Creating quest ####
+This guide is about creating events for quests. 
+This guide assumes you already know how to create map images and collisions grid. Check /map/creation for that.
+This guide assumes you will use enemy/sprites/anim/icons already present in the game engine. 
+
+You can check quest examples in the submissionExample folder. (RECOMMENDED)
+
+####################################
+In order to use any .html file in this SDK that starts with "test-" (ex: test-dialogue.html), drag the file into a new google chrome browser page.
+
+####################################
+A quest submission must include everything needed in order for the quest to work.
+
+This can include:
+-Map (Image, Grid, Events)
+-Dialogue
+-Item
+
+Submission must include:
+1- quest code (.js, file name is [yourQuestId].js) 
+		This file contains info about dialogue, quest variables, maps, items etc...
+
+2- map images (each map are in a separate folder. CHECK /map/creation for more info)
+3- info.js (general information ex: author/date)
+
+
+Video Link (HIGHLY RECOMMENDED): 
+
+
+####################################
+SUMMARY:
+
+-Game Engine Basics
+-Quest Template
+-Dialogue
+-Map Events
+-Enemy
+-Item
+
+####################################
+GAME ENGINE BASICS:
+
+There are 3 types of entities that interacts with the player:
+1- Actor: 	Enemy, Player, Npc, Switch, Block, Cuttable Trees, Doors 
+2- Attack: 	Bullet, Strike
+3- Drop: 	Items on the ground
+
+The only entities we will use for quests is the actors.
+
+##################
+QUEST CONCEPT:
+
+A quest is a series of events the player must trigger.
+Each event is represented by a function, a part of code that modifies the player progression in the quest.
+
+Each quest event needs to be linked with a player action. 
+It's via this player action that the player will trigger the event.
+
+Examples:
+	Quest event: Open locked door.
+	Player Action: Activating a switch.
+	
+	Quest event: Start cutscene. 
+	Player Action: Reaching position x=1000, y= 1000 in map "dragonLair".
+	
+	Quest event: Receive dragon head. 
+	Player Action: Killing dragon.
+	
+	Quest event: Receive reward and finish quest. 
+	Player Action: Talking with King.
+	
+The same quest event may be linked with multiple player actions.
+
+Quest events can be accessed via q.event.  (Will be more clear later)
+
+############
+
+Player progression in a quest is saved in quest variables.
+Each quest variable has a unique name.
+Most quest events will access/modify those values.
+
+Example:
+
+custom quest variables list:
+	"haveKilledDragon" set to false
+
+1-	Quest event: Set quest variable "haveKilledDragon" to true
+	When
+	Player Action: Kill dragon.
+		
+2-	Quest event: 	if quest variable "haveKilledDragon" is true	=> 	Receive reward and finish quest. 
+					if quest variable "haveKilledDragon" is false	=> 	Get nothing
+	When
+	Player Action: Talking with King.
+	
+Note: Each quest also has default variables: 
+.complete		(if the quest is complete)
+.started		(if the quest was started. modifying a quest variable will set the started variable to true automatically)
+	
+############
+Maps contain the information about what actors to create. 
+Some of these actors (ex: switch, dragon) may or may not be used for a quest event.
+
+Each actors has a series of attributes that can be used to turn them more than just a regular actor.
+
+.deathFunc	:	Call quest event when dying.
+.dialogue	:	Call quest event when selecting talk option. Normally, this quest event will trigger a dialogue. 
+				Choosing an option in the dialogue can also trigger a quest event.
+.switch		:	Call quest event when selecting activate/deactivate option. 
+
+
+############
+
+Each account has multiple variables separated in two categories: player and quest.
+	Player contains the same variables than regular monsters/actors. (Ex: hp, speed, attack, defence)
+
+	Quest contains quest variables which track the current progression of all quests for a specify player.
+	Each quest variable has an unique name. 
+
+Each account has a unique id called "key".
+In order for the game engine to know what account you want to access, you need to specify the "key" to use.
+The key is always passed as the first parameter in any quest event you will create.
+
+
+getAct(key) will access the player variables
+	Ex: getAct(key).hp 		refers to the hp of the player corresponding to the key
+
+get(key,'questVariableName') will access the quest variable	
+	Ex:	get(key,'haveKilledDragon')		refers to the value of the quest variable named "haveKilledDragon" for the player with this key
+
+set(key,'questVariableName',newValue) will change the value of a quest variable
+	Ex: set(key,'haveKilledDragon',true)	changed the value of the quest variable named "haveKilledDragon" to true for the player with this key
+	
+#############
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	

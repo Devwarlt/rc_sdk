@@ -51,6 +51,10 @@ readFiles.script = function(e) {
 			aLayer = content.layers[i].data;
 		if(content.layers[i].name === 'ABOVE')
 			aboveLayer = content.layers[i].data;
+		if(content.layers[i].name === 'FALL')
+			fallLayer = content.layers[i].data;
+		if(content.layers[i].name === 'FALLCLOSE')
+			fallcloseLayer = content.layers[i].data;
 	}
 	
 	
@@ -58,11 +62,15 @@ readFiles.script = function(e) {
 		if(abLayer[i] === 0) abLayer.splice(i,1);
 		if(aLayer[i] === 0)	aLayer.splice(i,1);
 		if(aboveLayer[i] === 0)	aboveLayer.splice(i,1);
+		if(fallLayer[i] === 0)	fallLayer.splice(i,1);
+		if(fallcloseLayer[i] === 0)	fallcloseLayer.splice(i,1);
 	}
 	
 	var str = {};
 	str.ab = {'code':20001,'list':abLayer};
 	str.a = {'code':20051,'list':aLayer};
+	str.fall = {'code':20061,'list':fallLayer};
+	str.fallclose = {'code':20011,'list':fallcloseLayer};
 	str.above = {'list':aboveLayer};
 	
 	document.getElementById('show').innerHTML = '<TEXTAREA>' + JSON.stringify(str) + '</TEXTAREA>';

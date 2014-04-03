@@ -1,5 +1,5 @@
 q.dialogue['jenny'] = {'face':'Jenny',
-	'intro':{
+	'convo0':{
 		'intro':{
 			'text':"If you manage to kill all the different types of monsters, I'll give you something special.",
 			'option':[
