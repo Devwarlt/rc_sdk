@@ -17,8 +17,8 @@ q.event = {
 	killedDragon:function(key){
 		set(key,'killedDragon',1);
 	},
-	giveGold:function(key){
-		addItem(key,'gold',120);
+	giveGold:function(key,amount,am){
+		addItem(key,'gold',amount + am || 0);
 	},
 	setTalk:function(key){
 		set(key,'talk',1);

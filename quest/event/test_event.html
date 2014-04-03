@@ -23,7 +23,7 @@ div{	white-space:nowrap;		draggable:false;	readonly:readonly;	disabled:disabled;
 <button onclick="setInventoryVar();">Set Inventory to what this textbox has</button>
 <button onclick="updateInventoryVar();">Show current Inventory</button>
 
-<input onclick="Dialogue.end();"> End Dialogue Dialogue: </input>
+<button onclick="Dialogue.end(key);"> End Dialogue </button>
 <div  id="gameDiv" class='posAbs'>
 	<div id="canvasDiv" class='posAbs'>
 		<canvas id="ctx" width="600" height="200" style="border:1px solid #000000;"></canvas>
@@ -95,9 +95,9 @@ readFiles.script = function(e) {
 	var str = '<br>Call Quest Event: ';
 	for(var i in qt.event){
 		str += '<br><span ' +
-			'onclick="console.log(1); callFunc(\'' + i + '\');" ' +
-			'title="Call this function" ' + 
-			'> - ' + i + 
+			'onclick="callFunc(\'' + i + '\');" ' +
+			'title="Call this quest event" ' + 
+			'> - q.event.' + i + 
 			'</span>';
 		str += '(key,';
 		str += '<input id="QQQ' + i + '"></input>);';
@@ -111,7 +111,7 @@ readFiles.script = function(e) {
 
 callFunc = function(id){
 	var param = document.getElementById('QQQ' + id).value;
-	qt.func[id]('bob',eval(param));
+	eval('qt.event[id]("bob",' + param + ')');
 	updateQuestVar();
 	updateInventoryVar();
 }
@@ -120,7 +120,7 @@ updateQuestVar = function(){
 }
 setQuestVar = function(){
 	try {
-		List.main[key].quest[qt.id] = eval(document.getElementById('questVar').value);
+		eval('List.main[key].quest[qt.id] =' + document.getElementById('questVar').value);
 	} catch(err){ log("Problem with the quest variable. Make sure quotes and commas are correct."); }
 }
 updateInventoryVar = function(){
@@ -128,7 +128,7 @@ updateInventoryVar = function(){
 }
 setInventoryVar = function(){
 	try {
-		List.main[key].invList = eval(document.getElementById('inventoryVar').value);
+		eval('List.main[key].invList=' + document.getElementById('inventoryVar').value);
 	} catch(err){ log("Problem with the inventory. Make sure quotes and commas are correct."); }
 }
 
