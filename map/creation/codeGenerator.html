@@ -4,7 +4,19 @@ Select the .json file (Not the .tmx file)<br>
 <br>
 <div id="log"></div>
 
-<input type="checkbox" name="quest" id="quest" value="quest">Related to Quest<br>
+<input type="checkbox" onclick="document.getElementById('addondiv').style.visibility = this.checked ? 'visible' : 'hidden';" id="quest" value="quest">Related to Quest?<br>
+<div id="addondiv" style="visibility:hidden">
+	<input type="checkbox" id="addon" onclick="document.getElementById('layer').style.visibility = this.checked ? 'visible' : 'hidden';" value="quest">Map Addon?<br>
+	
+	<div id="layer" style="visibility:hidden">
+		Spot layer name: <input id="spot"><br>
+		Path layer name: <input id="path"><br>
+	</div>
+</div>
+
+
+
+
 
 <input type="file" class="upload" onchange="readFiles(this.files)" multiple="" />
 <div id="show"></div>
@@ -50,8 +62,8 @@ readFiles.script = function(e) {
 		log('You need to load the .json file, not the .tmx file.');
 	}
 	
-	var name = this.fileName.slice(0,this.fileName.indexOf('.'));
-	var content = JSON.parse(e.target.result); 	
+	name = this.fileName.slice(0,this.fileName.indexOf('.'));
+	content = JSON.parse(e.target.result); 	
 	
 	version = content.tilesets[0].image.slice(-10).slice(0,4);	//assumes tileset name is 1 digit
 	convertChart = convertChartAll[version];
@@ -60,6 +72,12 @@ readFiles.script = function(e) {
 	height = content.height;
 	width = content.width;
 	
+	if(document.getElementById("quest").checked && document.getElementById("addon").checked)
+		readFiles.script.addon(content);
+	else readFiles.script.normal(content);
+}
+
+readFiles.script.normal = function(content){
 	//get collision
 	for(var i in content.layers){
 		if(content.layers[i].name === 'COLLISION')
@@ -87,15 +105,41 @@ readFiles.script = function(e) {
 	'&#9;' + 'm.lvl = 0;' + '<br>' +
 	'&#9;' + 'm.tileset = "' + version + '";' + '<br>' +
 	'&#9;' + 'm.grid = ' + collisionData.toString() + '<br>' +
-	'&#9;' + 'var a = m.addon.' + (q ? 'YOURQUESTID' : 'main') + ' = {};' + '<br>' +
+	'&#9;' + 'var a = m.addon' + (q ? '[Q]' : '.main') + ' = {};' + '<br>' +
 	'&#9;' + 'a.spot = ' + JSON.stringify(zoneData) + '<br>' +
 	'&#9;' + 'a.path = ' + JSON.stringify(cutsceneData) + '<br>' +
+	'&#9;' + 'a.variable = {}; <br>' +
+	'&#9;' + 'a.load = function(map,spot,v,m){} <br>' +
+	'&#9;' + 'a.loop = function(map,spot,v,m){} <br>' +
 	'&#9;' + 'return m;' + '<br>' +
 	'};' + '</pre>'
 
 	document.getElementById('show').innerHTML = str;
 }
 
+
+
+readFiles.script.addon = function(content){
+	var zoneData, cutsceneData;
+	//get collision
+	for(var i in content.layers){
+		if(content.layers[i].name === document.getElementById('spot').value)
+			zoneData = zoneCrunch(content.layers[i].data);
+		if(content.layers[i].name === document.getElementById('path').value)
+			cutsceneData = cutsceneCrunch(content.layers[i].data);
+	}
+
+	var str = '<pre>' + 
+	'q.mapAddon.' + name + ' = {' + '<br>' +
+	'&#9;spot:' + JSON.stringify(zoneData || {}) +',<br>' +
+	'&#9;path:' + JSON.stringify(cutsceneData || {}) +',<br>' +
+	'&#9;variable:{},<br>' +
+	'&#9;load:function(map,spot,v,m){}, <br>' +
+	'&#9;loop:function(map,spot,v,m){} <br>' +
+	'}</pre>';
+	
+	document.getElementById('show').innerHTML = str;
+}
 
 
 convertChartAll = {

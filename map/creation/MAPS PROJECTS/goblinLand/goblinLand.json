@@ -94,7 +94,7 @@
          "name":"COLLISION",
          "opacity":1,
          "type":"tilelayer",
-         "visible":true,
+         "visible":false,
          "width":192,
          "x":0,
          "y":0
@@ -105,7 +105,7 @@
          "name":"SPOT",
          "opacity":1,
          "type":"tilelayer",
-         "visible":true,
+         "visible":false,
          "width":192,
          "x":0,
          "y":0

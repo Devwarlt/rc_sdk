@@ -1,0 +1,82 @@
+
+<div id="log"></div>
+<input type="file" class="upload" onchange="readFiles(this.files)" multiple="" />
+<div id="show"></div>
+<script>
+log = function(txt){ document.getElementById('log').innerHTML += txt + '<br>'; }
+  
+
+String.prototype.replaceAll = function (find, replace) {
+    var str = this;
+    return str.replace(new RegExp(find, 'g'), replace);
+};
+
+String.prototype.numberOnly = function(num){
+	var sign = this[0] === '-';
+	var a = this.replace(/[^\d.]/g, "");
+	if(sign) a = '-' + a;
+	if(num){ a = +a; }
+	return a;
+}
+String.prototype.capitalize = function() {
+	return this.charAt(0).toUpperCase() + this.slice(1);
+}
+
+
+readFiles = function(files) {
+	for (var i in files) { //for multiple files          
+		(function(file) {
+			var reader = new FileReader();  
+			
+			reader.fileName = file.name;
+			reader.onload = readFiles.script;
+			reader.readAsText(file, "UTF-8");
+			
+			
+		})(files[i]);
+	}
+}
+
+
+
+readFiles.script = function(e) {  
+	var name = this.fileName.slice(0,this.fileName.indexOf('.'));
+	var content = JSON.parse(e.target.result); 	
+	
+	//get collision layer
+	for(var i in content.layers){
+		if(content.layers[i].name === 'AB')
+			abLayer = content.layers[i].data;
+		if(content.layers[i].name === 'A')
+			aLayer = content.layers[i].data;
+		if(content.layers[i].name === 'ABOVE')
+			aboveLayer = content.layers[i].data;
+		if(content.layers[i].name === 'FALL')
+			fallLayer = content.layers[i].data;
+		if(content.layers[i].name === 'FALLCLOSE')
+			fallcloseLayer = content.layers[i].data;
+	}
+	
+	
+	for(var i = abLayer.length-1; i >=0 ; i--){
+		if(abLayer[i] === 0) abLayer.splice(i,1);
+		if(aLayer[i] === 0)	aLayer.splice(i,1);
+		if(aboveLayer[i] === 0)	aboveLayer.splice(i,1);
+		if(fallLayer[i] === 0)	fallLayer.splice(i,1);
+		if(fallcloseLayer[i] === 0)	fallcloseLayer.splice(i,1);
+	}
+	
+	var str = {};
+	str.ab = {'code':20001,'list':abLayer};
+	str.a = {'code':20051,'list':aLayer};
+	str.fall = {'code':20061,'list':fallLayer};
+	str.fallclose = {'code':20011,'list':fallcloseLayer};
+	str.above = {'list':aboveLayer};
+	
+	document.getElementById('show').innerHTML = '<TEXTAREA>' + JSON.stringify(str) + '</TEXTAREA>';
+}
+
+
+
+
+</script>

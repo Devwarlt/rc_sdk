@@ -1,5 +1,5 @@
 ### Creating map ####
-This guide is about creating map image, collision grid and hotspot. (No programming needed)
+This guide is about creating map image, collision grid, spot and path. (No programming needed)
 This guide is NOT about creating map events. (Programming needed)
 
 
@@ -42,12 +42,19 @@ Place Fall where player can fall.
 Place Fall Close around Fall squares. If player is over a Fall Close square, it will drag him into the hole. 
 
 
-### ZONE ### (Used for map events)
-One of the layer must be named ZONE. (Required. This layer can be empty though.)
-In order to make map events easier (enemy, npc, triggers etc), you can use Tiled to create hotspots.
-Use the letters on tileset 9 and place them on the layer ZONE.
-You can also create a rectangular zone by placing x2 times the same letter. (Only support rectangular shape.)
-Hotspots coordinates can be access via the object map.addon.main.hotspot[letter]
+### SPOT ### (Used for map events)
+One of the layer must be named SPOT. (Required. This layer can be empty though.)
+Spots are used to place actors (enemy, npc, triggers etc) in map more easily when creating map events.
+Use the letters on tileset 9 and place them on the layer SPOT.
+You can also create a rectangular zone by placing multiple times the same letter. (Only support rectangular shape.)
+Placing x2 times the same letters with create a spot in the middle of the 2 letters. (Useful when wanting to place a spot not exactly in the middle of a square)
+
+### PATH ### (Used for map events)
+One of the layer must be named PATH. (Required. This layer can be empty though.)
+Paths are used to make an actor (player, enemy) follow a specific path. (ex: cutscene)
+Use the numbers on tileset 9 and place them on the layer SPOT in order.
+The actor will run in straight line so make sure theres no wall inbetween.
+
 
 ####################################
 PREPARATION:

@@ -16,27 +16,38 @@ In order for the game engine to know which dialogue you want to use, you will ne
 
 Each node also has properties such as:
 
-	Text:	What message is showed to the player.
+	text:	What message is showed to the player.
 			Ex: "Hello adventurers. How are you today?"
 					
-	Face:	Face appearing in the Chat Box when NPC talking (referring to Db.dialogue.face).	
-			Ex: bobFace
+	face:	Face appearing in the Chat Box when NPC talking
 				
-	Option: List of choice given to the player. 
+	option: List of choice given to the player. 
 			Selecting an option will change the current dialogue. 
 			Options can also trigger custom functions that will be used when making quests. (Ex: give an item)
 	
-	Func:	Quest Event to call when player accesses this dialogue
+	func:	Quest Event to call when player accesses this dialogue
 	
+###
+Each face has the properties:
+	
+	image:	What image to use. (referring to Db.dialogue.face).	
+			Ex: "warrior-man.0"
+	
+	name:	Name appearing below the image.
+			Ex: "Bob"
+	
+	If you don't want to display any face, set face to "none".
+	If you want to display the player face, set face to "player".	
+
 Each option has the properties:
 
-	Text:	What is the text of the option
+	text:	What is the text of the option
 			Ex: "I'm fine. Thanks for asking."
 	
-	Next:	Reference to the next dialogue to display if the player chooses this option.
+	next:	Reference to the next dialogue to display if the player chooses this option.
 			Ex: {npc:'bob',convo:'introduction',node:'giveQuest'}
 	
-	Func:	Quest Event to call when player chooses this option
+	func:	Quest Event to call when player chooses this option
 			
 	
 #################
@@ -75,7 +86,7 @@ node0:{
 
 node0:{
 	text:"Hello, how are you?",
-	face:'bobFace',
+	face:{image:'warrior-man.0',name:"Bob"},
 	option:[
 		{text:"Great.",
 			next:{npc:'npcName',convo:'convo0',node:'node1'},
@@ -104,6 +115,7 @@ The param "func" contains the quest event to trigger if the player chooses that 
 
 node0:{
 	text:"Would you like to be teleported to the dragon lair?",
+	face:"none",
 	option:[
 		{text:"Yes.",
 			func:q.event.teleportDragonLair
@@ -115,7 +127,8 @@ node0:{
 ### 
 
 node0:{
-	text:"Hello, how are you?",
+	text:"Hello, I found your ring.",
+	face:"player",
 	func:q.event.giveRing
 }
 

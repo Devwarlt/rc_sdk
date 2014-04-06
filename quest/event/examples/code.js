@@ -3,13 +3,14 @@ var q = Quest.template('Qtestdialogue','v1.1');
 q.variable = {
 	'talk':0,
 	'killedDragon':0,
+	'haveReceivedGold':0,
 };
 
 q.event = {
 	dialogue1:function(key){
-		if(!get(key,'talk')) 
+		if(get(key,'talk') === 0) 
 			dialogue(key,'jenny','intro','first');
-		else if(get(key,'talk') && !get(key,'killedDragon')) 
+		else if(get(key,'talk') === 1 && get(key,'killedDragon') === 0) 
 			dialogue(key,'jenny','intro','second');
 		else 
 			dialogue(key,'jenny','intro','gratz');
@@ -17,8 +18,11 @@ q.event = {
 	killedDragon:function(key){
 		set(key,'killedDragon',1);
 	},
-	giveGold:function(key,amount,am){
-		addItem(key,'gold',amount + am || 0);
+	giveGold:function(key){
+		if(get(key,'haveReceivedGold') === 0){
+			addItem(key,'gold',10);
+			set(key,'haveReceivedGold',1);
+		}
 	},
 	setTalk:function(key){
 		set(key,'talk',1);

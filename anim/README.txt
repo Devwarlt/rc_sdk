@@ -43,7 +43,7 @@ Create a file named "info.js".
 
 Template
 {
-	"credits":["Enterbrain","otherGuy"],	
+	"credits":["yourName","otherGuy"],	
 	"date":"2014-03-10",
 	"modifications":[],
 	"comments":"The animation would look better in red."
