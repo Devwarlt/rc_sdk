@@ -1,6 +1,6 @@
 ### Creating animation ####
 
-Submission must include:
+Submission must include: 
 1- image (.png format, compressed with Pngquant)
 2- code.js (information server needs to use the animation)
 3- info.js (general information ex: author/date)
