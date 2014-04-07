@@ -3,4 +3,4 @@ STEPS:
 2- Click on cropping.bat.
 3- Delete empty images.
 
-Note: You need to have installed ImageMagick first. You also need to be on Windows.
+Note: You need to have installed ImageMagick first. (check SOFTWARE/ImageMagick) You also need to be on Windows.
