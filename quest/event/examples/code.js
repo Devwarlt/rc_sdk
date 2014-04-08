@@ -29,7 +29,7 @@ q.event = {
 	}
 };
 
-q.dialogue['jenny'] = {'face':'Jenny',
+q.dialogue['jenny'] = {'face':{'image':'warrior-male.0','name':'Jenny'},
 	'intro':{
 		'first':{
 			'text':"Go kill dragon.",

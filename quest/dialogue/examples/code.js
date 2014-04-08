@@ -1,4 +1,5 @@
-q.dialogue['jenny'] = {'face':'Jenny',
+q.dialogue['jenny'] = {
+	'face':{'image':'warrior-male.0','name':'Jenny'},
 	'convo0':{
 		'intro':{
 			'text':"If you manage to kill all the different types of monsters, I'll give you something special.",
