@@ -1,24 +1,12 @@
-This generator will automatically generate the code.js file. It assumes you have already made the map entirely (COLLISION and ZONE layer done).<br>
+Load the map to know what spots you haven't used yet.<br>
 <br>
 Select the .json file (Not the .tmx file)<br>
 <br>
+This will show the UNUSED spots. It only checks the SPOT layer. No need to refresh page, just load the file again to update.
 <div id="log"></div>
 
-<input type="checkbox" onclick="document.getElementById('addondiv').style.visibility = this.checked ? 'visible' : 'hidden';" id="quest" value="quest">Related to Quest?<br>
-<div id="addondiv" style="visibility:hidden">
-	<input type="checkbox" id="addon" onclick="document.getElementById('layer').style.visibility = this.checked ? 'visible' : 'hidden';" value="quest">Map Addon?<br>
-	
-	<div id="layer" style="visibility:hidden">
-		Spot layer name: <input id="spot"><br>
-		Path layer name: <input id="path"><br>
-	</div>
-</div>
-
-
-
-
-
-<input type="file" class="upload" onchange="readFiles(this.files)" multiple="" />
+<input type="file" class="upload" onchange="readFiles(this.files)" onclick="this.value='';" multiple="" /><br>
+<textarea id="textarea" rows="15" cols="100"></textarea>
 <div id="show"></div>
 <script>
 log = function(txt){ document.getElementById('log').innerHTML += txt + '<br>'; }
@@ -58,10 +46,6 @@ readFiles = function(files) {
 
 
 readFiles.script = function(e) {  
-	if(this.fileName.indexOf('.json') !== -1){
-		log('You need to load the .json file, not the .tmx file.');
-	}
-	
 	name = this.fileName.slice(0,this.fileName.indexOf('.'));
 	content = JSON.parse(e.target.result); 	
 	
@@ -72,73 +56,31 @@ readFiles.script = function(e) {
 	height = content.height;
 	width = content.width;
 	
-	if(document.getElementById("quest").checked && document.getElementById("addon").checked)
-		readFiles.script.addon(content);
-	else readFiles.script.normal(content);
-}
-
-readFiles.script.normal = function(content){
-	//get collision
-	for(var i in content.layers){
-		if(content.layers[i].name === 'COLLISION')
-			collisionData = collisionCrunch(content.layers[i].data);
+	for(var i in content.layers)
 		if(content.layers[i].name === 'SPOT')
-			zoneData = zoneCrunch(content.layers[i].data);
-		if(content.layers[i].name === 'PATH')
-			cutsceneData = cutsceneCrunch(content.layers[i].data);
+			var spot = content.layers[i].data;
+	
+	
+	for(var i in spot)
+		delete convertChart[spot[i]];
+	
+	for(var i in convertChart)
+		if(convertChart[i].length > 2 || convertChart[i] === '1'|| convertChart[i] === '2'|| convertChart[i] === '3'|| convertChart[i] === '4') delete convertChart[i];
+	
+	var tmp = [];
+	for(var i in convertChart) tmp.push(convertChart[i]);
+	
+	var t = {misc:[],e:[],n:[],t:[],b:[],q:[],g:[],s:[]};
+	for(var i in tmp){
+		if(tmp[i].length === 1) t.misc.push(tmp[i]);
+		else {
+			t[tmp[i][0]].push(tmp[i]);
+		}
 	}
-	
-	if(!collisionData || !zoneData || !cutsceneData){
-		log('The layer "SPOT", "COLLISION" or "PATH" is missing.');
-		return;
-	}
-	
-	var q = document.getElementById("quest").checked;
-	var str = '<pre>' +
-	
-	(q ? 'q.map.' + name : 'Db.map["' + name + '"]') +
-	
-	' = function(){' + '<br>' +
-	'&#9;' + 'var m = Init.db.map.baseMap();' + '<br>' + 
-	'&#9;' + 'm.name = "' + name.capitalize() + '";' + '<br>' +
-	'&#9;' + 'm.graphic = "' + name + '";' + '<br>' +
-	'&#9;' + 'm.lvl = 0;' + '<br>' +
-	'&#9;' + 'm.tileset = "' + version + '";' + '<br>' +
-	'&#9;' + 'm.grid = ' + collisionData.toString() + '<br>' +
-	'&#9;' + 'var a = m.addon' + (q ? '[Q]' : '.main') + ' = {};' + '<br>' +
-	'&#9;' + 'a.spot = ' + JSON.stringify(zoneData) + '<br>' +
-	'&#9;' + 'a.path = ' + JSON.stringify(cutsceneData) + '<br>' +
-	'&#9;' + 'a.variable = {}; <br>' +
-	'&#9;' + 'a.load = function(spot){} <br>' +
-	'&#9;' + 'a.loop = function(spot){} <br>' +
-	'&#9;' + 'return m;' + '<br>' +
-	'};' + '</pre>'
-
-	document.getElementById('show').innerHTML = str;
-}
-
-
-
-readFiles.script.addon = function(content){
-	var zoneData, cutsceneData;
-	//get collision
-	for(var i in content.layers){
-		if(content.layers[i].name === document.getElementById('spot').value)
-			zoneData = zoneCrunch(content.layers[i].data);
-		if(content.layers[i].name === document.getElementById('path').value)
-			cutsceneData = cutsceneCrunch(content.layers[i].data);
-	}
-
-	var str = '<pre>' + 
-	'q.mapAddon.' + name + ' = {' + '<br>' +
-	'&#9;spot:' + JSON.stringify(zoneData || {}) +',<br>' +
-	'&#9;path:' + JSON.stringify(cutsceneData || {}) +',<br>' +
-	'&#9;variable:{},<br>' +
-	'&#9;load:function(map,spot,v,m){}, <br>' +
-	'&#9;loop:function(map,spot,v,m){} <br>' +
-	'}</pre>';
-	
-	document.getElementById('show').innerHTML = str;
+	var str = '';
+	for(var i in t)
+		str += t[i] + '\n';
+	document.getElementById('textarea').value = str;	
 }
 
 
@@ -166,7 +108,7 @@ convertChartAll = {
 		'20701':'g1','20702':'g2','20703':'g3','20704':'g4','20705':'g5','20706':'g6','20707':'g7','20708':'g8',
 		'20751':'q1','20752':'q2','20753':'q3','20754':'q4','20755':'q5','20756':'q6','20757':'q7','20758':'q8',
 		'20801':'b1','20802':'b2','20803':'b3','20804':'b4','20805':'b5','20806':'b6','20807':'b7','20808':'b8',
-		'20851':'s1','20852':'s2','20853':'s3','20854':'s4','20855':'s5','20856':'s6','20857':'s7','20858':'s8',	
+		'20851':'s1','20852':'s2','20853':'s3','20854':'s4','20855':'s5','20856':'s6','20857':'s7','20858':'s8',
 		
 		'20111':'blue,0','20112':'blue,1','20113':'blue,2','20114':'blue,3','20115':'blue,4','20116':'blue,5','20117':'blue,6','20118':'blue,7','20119':'blue,8','20120':'blue,9','20121':'blue,10','20122':'blue,11','20123':'blue,12','20124':'blue,13','20125':'blue,14','20126':'blue,15','20127':'blue,16','20128':'blue,17','20129':'blue,18','20130':'blue,19','20131':'blue,20','20132':'blue,21','20133':'blue,22','20134':'blue,23',
 		'20161':'red,0','20162':'red,1','20163':'red,2','20164':'red,3','20165':'red,4','20166':'red,5','20167':'red,6','20168':'red,7','20169':'red,8','20170':'red,9','20171':'red,10','20172':'red,11','20173':'red,12','20174':'red,13','20175':'red,14','20176':'red,15','20177':'red,16','20178':'red,17','20179':'red,18','20180':'red,19','20181':'red,20','20182':'red,21','20183':'red,22','20184':'red,23',
@@ -176,125 +118,6 @@ convertChartAll = {
 		'20361':'pink,0','20362':'pink,1','20363':'pink,2','20364':'pink,3','20365':'pink,4','20366':'pink,5','20367':'pink,6','20368':'pink,7','20369':'pink,8','20370':'pink,9','20371':'pink,10','20372':'pink,11','20373':'pink,12','20374':'pink,13','20375':'pink,14','20376':'pink,15','20377':'pink,16','20378':'pink,17','20379':'pink,18','20380':'pink,19','20381':'pink,20','20382':'pink,21','20383':'pink,22','20384':'pink,23',
 	}
 }
-
-/*
-//cutscene generator
-var str = '';
-var color = ['blue','red','yellow','green','orange','pink'];
-for(var j in color){
-	for(var i = 0; i < 24; i++)
-		str += "'" + (20111 + i + 50*+j) + "':'" + color[j] + "," + i + "',"
-	str += '\n';
-}
-console.log(str);
-*/
-
-
-zone = {};
-
-
-
-function collisionCrunch(data){
-	for(var j = 0 ; j < height*width ;j++){
-		if(convertChart[data[j]]) data[j] = convertChart[data[j]];
-		else data[j] = 0;
-	}
-
-	//Make 2D array
-	var str = '["';
-	for(var j = 0 ; j < height ;j++){
-		for(var i = 0 ; i < width ; i++){
-			str += data[i+width*j];
-		}
-		str += '","';
-		//str += '",\n"';
-	}
-	str = str.slice(0,-2);
-	str += ']';
-	
-	return str;
-}
-
-function zoneCrunch(data){
-	var array = array2d(data);
-	
-	//Zone
-	for(var y = 0 ; y < array.length ;y++){
-		for(var x = 0 ; x < array[y].length ; x++){
-			if(array[y][x] == 0) continue;
-			var type = convertChart[array[y][x]];
-			if(!zone[type]){
-				zone[type] = {start:{x:x,y:y},count:0};
-			}
-			zone[type].end = {x:x,y:y};
-			zone[type].count++;
-		} 
-	}	
-
-
-	 
-	for(var i in zone){
-		//1 length => 1 pts
-		if(zone[i].start.x == zone[i].end.x && zone[i].start.y == zone[i].end.y){
-			zone[i] = {x:zone[i].start.x*32+16,y:zone[i].start.y*32+16};
-			continue;
-		}
-		if(zone[i].count === 2){
-			zone[i] = {x:(zone[i].start.x+zone[i].end.x)/2*32+16,y:(zone[i].start.y+zone[i].end.y)/2*32+16};
-			if(Math.abs(zone[i].start.x-zone[i].end.x) > 320 || Math.abs(zone[i].start.y-zone[i].end.y) > 320) log('Warning. Big space gap with spot ' + i);
-			continue;
-		}
-		
-		//Zone
-		zone[i] = [zone[i].start.x*32,zone[i].end.x*32,zone[i].start.y*32,zone[i].end.y*32];
-	}
-
-	
-	return zone;
-
-
-}
-
-function array2d(data){
-	var array = [];
-	for(var j = 0 ; j < height ;j++){
-		array[j] = [];
-		for(var i = 0 ; i < width ; i++){
-			array[j][i] = data[i+width*j];
-		}
-	}
-	return array;
-}
-
-function cutsceneCrunch(data){
-	var array = array2d(data);
-	
-	var color = ['blue','red','yellow','green','orange','pink'];
-	
-	var cutscene = {};
-	for(var i in color) cutscene[color[i]] = [];
-	
-	//Zone
-	for(var y = 0 ; y < array.length ;y++){
-		for(var x = 0 ; x < array[y].length ; x++){
-			var type = convertChart[array[y][x]];
-			if(type !== undefined){
-				type = type.split(',');
-				cutscene[type[0]][type[1]] = {x:x*32+16,y:y*32+16};
-			}
-		} 
-	}	
-	for(var i in cutscene) if(!cutscene[i].length) delete cutscene[i];
-	
-	return cutscene;
-}
-
-
-
-
-
-
-
 
 
 </script>

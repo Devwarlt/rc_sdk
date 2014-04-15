@@ -61,7 +61,7 @@ readFiles.script = function(e) {
 	q = {dialogue:{},event:{}};
 	try {	var content = eval(e.target.result); 
 	} catch(err){
-		log('Problem with file ' + name + '. Check template to make sure everything fits. Special attention to commas and quotes.');
+		log('Problem with file ' + name + '. Check template to make sure everything fits. Special attention to commas and quotes. <br>' + err);
 	}
 	
 	
@@ -74,12 +74,12 @@ readFiles.script = function(e) {
 		for(var j in Db.dialogue[i])	//j = npc
 			for(var k in Db.dialogue[i][j])	//k = convo
 				for(var m in Db.dialogue[i][j][k]){	//m = node
-					var id = "'" + i + "'," + "'" + j + "'," + "'" + k + "'," + "'" + m + "'";
+					var id = "'" + j + "'," + "'" + k + "'," + "'" + m + "'";
 					str += '<br><span ' +
 					'onclick="selectDia(' + id + ');" ' +
 					'title="Start this dialogue" ' + 
 					'>' +
-					'<font size="4">Dialogue.start(key,{group:\"' + i + '\",npc:\"' + j + '\",convo:\"' + k  + '\",node:\"' + m + '\"});</font>' +
+					'<font size="4">dialogue(key,' + id + ');</font>' +
 					'</span>';
 				}
 	}		
@@ -87,8 +87,8 @@ readFiles.script = function(e) {
 	
 	
 };
-selectDia = function(i,j,k,m){
-	Dialogue.start('bob',{group:i, npc:j,convo:k,node:m});
+selectDia = function(j,k,m){
+	Dialogue.start('bob',{group:'QUESTID', npc:j,convo:k,node:m});
 }
 	
 	
@@ -117,7 +117,6 @@ Img.face.src = 'faceSheet.png';
 		}
 	}
 })();
-
 
 
 
@@ -151,7 +150,7 @@ Draw.chat.dialogue = function(){
 			'onclick="selectOption(' + i + ');" ' +
 			'title="' + dia.option[i].text + '"' + 
 			'>' +
-			'<font size="4"> -' + dia.option[i].text + '</font>' +
+			'<font size="4">&nbsp; - ' + dia.option[i].text + '</font>' +
 			'</span>';
 	}
 	Draw.setInnerHTML(html.dialogue.text,str);
@@ -230,7 +229,7 @@ Dialogue.start = function(key,d){
 	var main = List.main[key];
 	main.dialogue = dia;
 	
-	document.getElementById('currentDialogue').innerHTML = 'Dialogue.start(key,{group:\"' + d.group + '\",npc:\"' + d.npc + '\",convo:\"' + d.convo  + '\",node:\"' + d.node + '\"})';
+	document.getElementById('currentDialogue').innerHTML = 'dialogue(key,\"' + d.npc + '\",\"' + d.convo  + '\",\"' + d.node + '\")';
 	//if(dia.func) applyFunc.key(key,dia.func,dia.param);
 	}catch(err){
 		log("This dialogue doesn't exist : " + JSON.stringify(d));
@@ -278,11 +277,18 @@ Dialogue.init = function(){
 						next.convo = next.convo || j ;
 					}				
 				}
-				delete npc.face;
+				delete convo.face;
 			}
+			delete npc.face;
 		}
 	}
 }
+
+Quest = {};
+Quest.template = function(id,version){return {id:id || Math.random(),version: version || 'v1.0',name:'Default Quest',icon:'skill.melee',reward:{boost:{'stat':'dmg-fire-+','value':[0.05,0.10]},exp:{}},description:"Default Description",lvl:0,difficulty:'Easy',variable:{},requirement:[],dialogue:{},challenge:{},mapAddon:{},map:{},item:{}, equip:{},enemy:{},ability:{},plan:{},event:{},skillPlot:[],boss:{}};}
+Quest.template.eval = function(q){ return 'Q = q.id;'; }
+
+exports = {};
 
 </script>
 

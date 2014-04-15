@@ -5,39 +5,38 @@ Attack
 ####################################
 MAPS EVENTS:
 
-In order for the map to be more than just an image, you will need to add an addon to it.
-By default the name of the addon is your quest id.
+By default, a map is just a plain image.
+To bring life to the map, you will need to add an addon to it that will dictate what monsters/npc/lever to spawn.
+
+When creating a quest, you might also want to modify a pre-existing map. 
+To do that, you will create a new addon to pre-existing maps to modify them to your needs. 
+
+Always use the rc_sdk/map/creation/codeGenerator.html to get the addon template.
+
 There are 3 different attributes for each addon: spot, load, loop.
 
-Don't forget to check examples for the general addon structure.
+ADVANCED: 
+By default the name of the addon is your quest id.
+There's a fourth attribute .variable that can contain any type of variable. Access it via this.variable in load or loop functions. 
 
 ####
 .spot: Object
 	List of position in the map.
 	Spots should be generated automatically via Tiled by adding letters from the Tileset 9 on the map on the ZONE layer.	Check /map/creation for more info.
 	
-	Those hotspots can be accessed via the "spot.[letter]" variable.
+	spot will be the first parameter in the functions load and loop.
+	A specific spot can be accessed via the "spot.[letter]".
 	Ex: spot.a 	will contain the x, y and mapId of the letter 'a' in the tile project. (Note: spot['a'] is the EXACT same thing than spot.a)
 
 ####
-.load: Function(String:map, Object:spot, Object:v, Object:m)
-	map: 	complete mapId string
-	spot: 	the spot for that map
-	v:		map variables (ADVANCED)
-	m: 		complete map object (ADVANCED)
-	
+.load: Function(spot)		
 	This function will be called once when initializing the map.
 	Used for: Create enemy, create npc, create switch, create block etc...
 
 ####
-.loop Function(String:map, Object:spot, Object:v, Object:m)
-	map: 	complete mapId string
-	spot: 	the spot for that map
-	v:		map variables (ADVANCED)
-	m: 		complete map object (ADVANCED)
-
+.loop Function(spot)	
 	This function will be called every frame (25 times per second).
-	Used for: Test collision that will trigger another event.
+	Used for: Test collision that will trigger another event. Ex: Teleport Zone. 
 	
 ######################
 LOAD:
@@ -208,9 +207,31 @@ Create Actor: (Enemy, Npc, Switch, Block, Cuttable Trees, Doors)
 ###################		
 LOOP COMMON FUNCTIONS
 
-Everything in the loop function will be called every frame. 
 
-However, for performance reasons, it is advised to use Loop.interval
+	
+####
+Call Quest Event if player is in a zone:
+	If a player is in that zone, call a quest event.
+	
+	PARAM: 	0: spot zone. (should have been made with multiple letters in Tiled)
+			1: quest event to call
+	
+
+
+	
+	ex:
+	collision(spot.a,q.event.spawnEnemy);
+	
+	//An example of what the quest event could be:
+	q.event.damagePlayer = function(key){
+		getAct(key).hp -= 100;
+	} 
+	
+	
+	
+	
+Everything in the loop function will be called every frame. 
+However, for performance reasons, it is advised to use Loop.interval (not needed for teleZone and collision though)
 
 	Loop.interval(time)   return true every [time] frames.
 	
@@ -218,28 +239,6 @@ Ex:
 if(Loop.interval(100)){		//do something... every 100 frames (every 4 seconds)
 	something...
 }
-	
-####
-Call Quest Event if player is in a zone:
-	If a player is in that zone, call a quest event.
-	
-	PARAM: 	0: always put map,
-			1: spot zone. (should have been made with multiple letters in Tiled)
-			2: actor type to trigger ('player' or 'enemy')
-			3: quest event to call
-	
-	ex:
-	Map.collisionRect(map,spot.a,'player',q.func.teleportPlayer);
-
-	//An example of what the quest event could be:
-	q.event.teleportPlayer = function(key){
-		teleport(key,0,0,'dragonLair');
-	} 
-	
-	
-	
-	
-	
 	
 	
 	

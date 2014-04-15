@@ -74,6 +74,7 @@ readFiles.script = function(e) {
 		log('Problem with file ' + name + '. Check template to make sure everything fits. Special attention to commas and quotes.');
 	}
 	qt = q;
+	console.log(qt);
 	Q = qt.id;
 	Db.dialogue[qt.id] = qt.dialogue;
 	Dialogue.init();
@@ -180,7 +181,7 @@ Draw.chat.dialogue = function(){
 			'onclick="selectOption(' + i + ');" ' +
 			'title="' + dia.option[i].text + '"' + 
 			'>' +
-			'<font size="4"> -' + dia.option[i].text + '</font>' +
+			'<font size="4">&nbsp; - ' + dia.option[i].text + '</font>' +
 			'</span>';
 	}
 	Draw.setInnerHTML(html.dialogue.text,str);
@@ -310,8 +311,9 @@ Dialogue.init = function(){
 						next.convo = next.convo || j ;
 					}				
 				}
-				delete npc.face;
+				delete convo.face;
 			}
+			delete npc.face;
 		}
 	}
 }
@@ -336,30 +338,9 @@ Quest.complete = function(key,name){
 	List.main[key].quest[name].complete = 1;
 	log("Quest " + name + "complete");
 }
-Quest.template = function(){ return {dialogue:{},npc:{},variable:{},func:{}}; };
 
-addItem = function(key,item,amount){
-	List.main[key].invList[item] = List.main[key].invList[item] || 0;
-	List.main[key].invList[item] += amount;
-	updateInventoryVar();
-}
-removeItem = function(key,item,amount){
-	List.main[key].invList[item] = List.main[key].invList[item] || 0;
-	List.main[key].invList[item] -= amount;
-	if(List.main[key].invList[item] <= 0) delete List.main[key].invList[item];
-	updateInventoryVar();
-}
-haveItem = function(key,item,amount,info){
-	if(info === 'amount') List.main[key].invList[item] || 0;
-	return List.main[key].invList[item] > amount;
-}
-testItem = function(){ log("cant test this with this tester"); return true; }
-
-chat = function(key,txt){	log(txt); }
-
-teleport = function(key,x,y,map){ log('x:' + x + ' y:' + y + ' map:' + map);}
-
-
+Quest.template = function(id,version){return {id:id || Math.random(),version: version || 'v1.0',name:'Default Quest',icon:'skill.melee',reward:{boost:{'stat':'dmg-fire-+','value':[0.05,0.10]},exp:{}},description:"Default Description",lvl:0,difficulty:'Easy',variable:{},requirement:[],dialogue:{},challenge:{},mapAddon:{},map:{},item:{}, equip:{},enemy:{},ability:{},plan:{},event:{},skillPlot:[],boss:{}};}
+Quest.template.eval = function(){ return ''};
 
 applyFunc = function(func,param){
 	return func.apply(this, param);
@@ -371,7 +352,7 @@ applyFunc.key = function(key,func,param){
 
 
 
-//Eval
+//Eval Functions
 var get = function(key,attr){
 	var mq = List.main[key].quest[qt.id];
 	var a = mq[attr];
@@ -395,6 +376,37 @@ var dialogue = function(key,npc,convo,node){
 	Dialogue.start(key,{group:qt.id,npc:npc,convo:convo,node:node});
 }
 
+addItem = function(key,item,amount){
+	amount = amount || 1;
+	List.main[key].invList[item] = List.main[key].invList[item] || 0;
+	List.main[key].invList[item] += amount;
+	updateInventoryVar();
+}
+removeItem = function(key,item,amount){
+	amount = amount || 1;
+	List.main[key].invList[item] = List.main[key].invList[item] || 0;
+	List.main[key].invList[item] -= amount;
+	if(List.main[key].invList[item] <= 0) delete List.main[key].invList[item];
+	updateInventoryVar();
+}
+haveItem = function(key,item,amount,info){
+	amount = amount || 1;
+	if(info === 'amount') return List.main[key].invList[item] || 0;
+	return List.main[key].invList[item] >= amount;
+}
+testItem = function(){ log("cant test this with this tester"); return true; }
+
+chat = function(key,txt){	log(txt); }
+
+teleport = function(key,x,y,map){ log('x:' + x + ' y:' + y + ' map:' + map);}
+freeze = function(){};
+unfreeze = function(){};
+cutscene = function(){};
+
+var startQuest = function(key){
+	set(key,'started',true);
+}
+var sprite = function(key,name,size){}
 
 </script>
 

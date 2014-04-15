@@ -77,9 +77,14 @@
    eJztlsENgCAMAFmFt7uwAfuv4cePJg20FCzkLrmXCl5iibmklBER8XejQkcs6IgFHWvfS3s/Hb6c0qFlVsfqfjp0686G+Rjb03KttebKjt4zVOIqb3fuqI90+HRIa/XsE+m7as25ZR867Jxw7s6CjljM6Bhptz5LBx0jSOvuNucRO77/SpI7dNSGp3ZI0OHToZ2PiB2e0BELbQcinuMNZ8AU0Q==
   </data>
  </layer>
- <layer name="ZONE" width="50" height="50">
+ <layer name="SPOT" width="50" height="50" visible="0">
   <data encoding="base64" compression="zlib">
    eJzt1zkBACAMA8AqxBWfaywwtUPvDGTIkkQAAJ3MkZu3kvMAAKix7T4AAODD8R3auLoGoMgD4R4EKg==
+  </data>
+ </layer>
+ <layer name="PATH" width="50" height="50" visible="0">
+  <data encoding="base64" compression="zlib">
+   eJztwQENAAAAwqD3T20ON6AAAAAAAAAAAADg3wAnEAAB
   </data>
  </layer>
 </map>
