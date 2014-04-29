@@ -4,8 +4,7 @@ Select the .json file (Not the .tmx file)<br>
 <br>
 <div id="log"></div>
 
-<input type="checkbox" onclick="document.getElementById('addondiv').style.visibility = this.checked ? 'visible' : 'hidden';" id="quest" value="quest">Related to Quest?<br>
-<div id="addondiv" style="visibility:hidden">
+<div id="addondiv">
 	<input type="checkbox" id="addon" onclick="document.getElementById('layer').style.visibility = this.checked ? 'visible' : 'hidden';" value="quest">Map Addon?<br>
 	
 	<div id="layer" style="visibility:hidden">
@@ -72,7 +71,7 @@ readFiles.script = function(e) {
 	height = content.height;
 	width = content.width;
 	
-	if(document.getElementById("quest").checked && document.getElementById("addon").checked)
+	if(document.getElementById("addon").checked)
 		readFiles.script.addon(content);
 	else readFiles.script.normal(content);
 }
@@ -93,19 +92,18 @@ readFiles.script.normal = function(content){
 		return;
 	}
 	
-	var q = document.getElementById("quest").checked;
 	var str = '<pre>' +
 	
-	(q ? 'q.map.' + name : 'Db.map["' + name + '"]') +
+	'q.map.' + name  +
 	
 	' = function(){' + '<br>' +
-	'&#9;' + 'var m = Init.db.map.baseMap();' + '<br>' + 
+	'&#9;' + 'var m = s.map();' + '<br>' + 
 	'&#9;' + 'm.name = "' + name.capitalize() + '";' + '<br>' +
 	'&#9;' + 'm.graphic = "' + name + '";' + '<br>' +
 	'&#9;' + 'm.lvl = 0;' + '<br>' +
 	'&#9;' + 'm.tileset = "' + version + '";' + '<br>' +
 	'&#9;' + 'm.grid = ' + collisionData.toString() + '<br>' +
-	'&#9;' + 'var a = m.addon' + (q ? '[Q]' : '.main') + ' = {};' + '<br>' +
+	'&#9;' + 'var a = m.addon[q.id] = {};' + '<br>' +
 	'&#9;' + 'a.spot = ' + JSON.stringify(zoneData) + '<br>' +
 	'&#9;' + 'a.path = ' + JSON.stringify(cutsceneData) + '<br>' +
 	'&#9;' + 'a.variable = {}; <br>' +
@@ -134,8 +132,8 @@ readFiles.script.addon = function(content){
 	'&#9;spot:' + JSON.stringify(zoneData || {}) +',<br>' +
 	'&#9;path:' + JSON.stringify(cutsceneData || {}) +',<br>' +
 	'&#9;variable:{},<br>' +
-	'&#9;load:function(map,spot,v,m){}, <br>' +
-	'&#9;loop:function(map,spot,v,m){} <br>' +
+	'&#9;load:function(spot){}, <br>' +
+	'&#9;loop:function(spot){} <br>' +
 	'}</pre>';
 	
 	document.getElementById('show').innerHTML = str;
@@ -240,8 +238,8 @@ function zoneCrunch(data){
 			continue;
 		}
 		if(zone[i].count === 2){
-			zone[i] = {x:(zone[i].start.x+zone[i].end.x)/2*32+16,y:(zone[i].start.y+zone[i].end.y)/2*32+16};
 			if(Math.abs(zone[i].start.x-zone[i].end.x) > 320 || Math.abs(zone[i].start.y-zone[i].end.y) > 320) log('Warning. Big space gap with spot ' + i);
+			zone[i] = {x:(zone[i].start.x+zone[i].end.x)/2*32+16,y:(zone[i].start.y+zone[i].end.y)/2*32+16};
 			continue;
 		}
 		

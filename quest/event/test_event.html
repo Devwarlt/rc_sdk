@@ -8,17 +8,18 @@ div{	white-space:nowrap;		draggable:false;	readonly:readonly;	disabled:disabled;
 .posAbs {	position:absolute;}
 </style>
 
+<script src="essentialsShare.js"></script>
 
 <input type="file" class="upload" onchange="readFiles(this.files)" multiple="" /><br>
 <div id="log"></div>
 <div id="dialogueList"></div>
 <br>
-<textarea id="questVar" rows="4" cols="50"></textarea>
+<textarea id="questVar" rows="4" cols="100"></textarea>
 <br>
 <button onclick="setQuestVar();">Set Quest Variables to what this textbox has</button>
 <button onclick="updateQuestVar();">Show current Quest Variables</button>
 <br>
-<textarea id="inventoryVar" rows="2" cols="50"></textarea>
+<textarea id="inventoryVar" rows="2" cols="100"></textarea>
 <br>
 <button onclick="setInventoryVar();">Set Inventory to what this textbox has</button>
 <button onclick="updateInventoryVar();">Show current Inventory</button>
@@ -36,6 +37,8 @@ div{	white-space:nowrap;		draggable:false;	readonly:readonly;	disabled:disabled;
 
 
 <script>
+var func = function(){};
+exports = {};
 log = function(txt){ document.getElementById('log').innerHTML = txt + '<br>'; }
   
 html = {dialogue:{div:document.getElementById('dialogueBoxDiv'),text:document.getElementById('dialogueBoxText')}};
@@ -69,29 +72,35 @@ readFiles = function(files) {
 
 readFiles.script = function(e) {  
 	var name = this.fileName.slice(0,this.fileName.indexOf('.'));
-	try {	var content = eval(e.target.result); 
+	try {	
+		g = e.target.result.replace('use strict','').replace('var q','q').replace('var s','s');
+		var content = eval(g); 
 	} catch(err){
-		log('Problem with file ' + name + '. Check template to make sure everything fits. Special attention to commas and quotes.');
+		log('Problem with file ' + name + '. Check template to make sure everything fits. Special attention to commas and quotes.<br>' + err.stack);
 	}
 	qt = q;
-	console.log(qt);
 	Q = qt.id;
 	Db.dialogue[qt.id] = qt.dialogue;
 	Dialogue.init();
 	qt.variable.complete = 0;
-	qt.variable.started = 0;
+	qt.variable.active = 0;
 	List.main.bob.quest[qt.id] = qt.variable;
 	
-	var str = '<br>Call Quest Event: ';
+	var str = '<br>Last Quest Event: <span id="lastEvent"></span>' ;
+	var count = 0;
+	str += '<table style="width:500px">'
 	for(var i in qt.event){
-		str += '<br><span ' +
+		if(count++ % 5 === 0) str += '<tr>';
+		str += '<td><span ' +
 			'onclick="callFunc(\'' + i + '\');" ' +
 			'title="Call this quest event" ' + 
-			'> - q.event.' + i + 
+			'>q.event.' + i + 
 			'</span>';
 		str += '(key,';
-		str += '<input id="QQQ' + i + '"></input>);';
-	}		
+		str += '<input id="QQQ' + i + '"></input>);</td>';
+		if(count % 5 === 0) str += '</tr>';
+	}	
+	str += 	'</table>';
 	document.getElementById('dialogueList').innerHTML = str;
 	updateQuestVar();
 	updateInventoryVar();
@@ -99,11 +108,18 @@ readFiles.script = function(e) {
 };
 
 
+
 callFunc = function(id){
+	document.getElementById('lastEvent').innerHTML = id + ' ' + (new Date().toLocaleTimeString());
+	log('');
+	Dialogue.end(key);
 	var param = document.getElementById('QQQ' + id).value;
 	eval('qt.event[id]("bob",' + (param || 'undefined') + ')');
 	updateQuestVar();
 	updateInventoryVar();
+	
+	
+
 }
 updateQuestVar = function(){
 	document.getElementById('questVar').value = JSON.stringify(main.quest[qt.id]);
@@ -333,83 +349,9 @@ Dialogue.init = function(){
 
 
 //Functions
-Quest = {};
-Quest.complete = function(key,name){
-	List.main[key].quest[name].complete = 1;
-	log("Quest " + name + "complete");
-}
-
-Quest.template = function(id,version){return {id:id || Math.random(),version: version || 'v1.0',name:'Default Quest',icon:'skill.melee',reward:{boost:{'stat':'dmg-fire-+','value':[0.05,0.10]},exp:{}},description:"Default Description",lvl:0,difficulty:'Easy',variable:{},requirement:[],dialogue:{},challenge:{},mapAddon:{},map:{},item:{}, equip:{},enemy:{},ability:{},plan:{},event:{},skillPlot:[],boss:{}};}
-Quest.template.eval = function(){ return ''};
-
-applyFunc = function(func,param){
-	return func.apply(this, param);
-}
-applyFunc.key = function(key,func,param){
-	return applyFunc(func,[key].concat(param));
-}
-
-
-
-
-//Eval Functions
-var get = function(key,attr){
-	var mq = List.main[key].quest[qt.id];
-	var a = mq[attr];
-	return typeof a === 'object' ? deepClone(a) : a;	//prevent setting
-}
-
-var set = function(key,attr,attr2,value){
-	var mq = List.main[key].quest[qt.id];
-	mq.started = true;
-	if(value === undefined) mq[attr] = attr2;	//aka deep = 1
-	else mq[attr][attr2] = value;
-	
-	if(attr === 'complete' && attr2)	Quest.complete(key,Q);
-}
-
-var getAct = function(key){
-	return List.all[key];
-}
-
-var dialogue = function(key,npc,convo,node){
-	Dialogue.start(key,{group:qt.id,npc:npc,convo:convo,node:node});
-}
-
-addItem = function(key,item,amount){
-	amount = amount || 1;
-	List.main[key].invList[item] = List.main[key].invList[item] || 0;
-	List.main[key].invList[item] += amount;
-	updateInventoryVar();
-}
-removeItem = function(key,item,amount){
-	amount = amount || 1;
-	List.main[key].invList[item] = List.main[key].invList[item] || 0;
-	List.main[key].invList[item] -= amount;
-	if(List.main[key].invList[item] <= 0) delete List.main[key].invList[item];
-	updateInventoryVar();
-}
-haveItem = function(key,item,amount,info){
-	amount = amount || 1;
-	if(info === 'amount') return List.main[key].invList[item] || 0;
-	return List.main[key].invList[item] >= amount;
-}
-testItem = function(){ log("cant test this with this tester"); return true; }
-
-chat = function(key,txt){	log(txt); }
-
-teleport = function(key,x,y,map){ log('x:' + x + ' y:' + y + ' map:' + map);}
-freeze = function(){};
-unfreeze = function(){};
-cutscene = function(){};
-
-var startQuest = function(key){
-	set(key,'started',true);
-}
-var sprite = function(key,name,size){}
 
 </script>
-
+<script src="Quest_exports.js"></script>
 
 
 
