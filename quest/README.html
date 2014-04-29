@@ -14,7 +14,7 @@ A quest submission must include everything needed in order for the quest to work
 This can include:
 -Map (Image, Grid, Events)
 -Dialogue
--Item
+-Items
 
 Submission must include:
 1- quest code (.js, file name is [yourQuestId].js) 
@@ -45,7 +45,7 @@ There are 3 types of entities that interacts with the player:
 2- Attack: 	Bullet, Strike
 3- Drop: 	Items on the ground
 
-The only entities we will use for quests is the actors.
+The only entity we will use for quests is the ACTOR.
 
 ##################
 QUEST CONCEPT:
@@ -82,31 +82,37 @@ Most quest events will access/modify those values.
 Example:
 
 custom quest variables list:
-	"haveKilledDragon" set to false
+	"haveKilledDragon" (set default to false)
 
-1-	Quest event: Set quest variable "haveKilledDragon" to true
+Quest event #1: 
+	Set quest variable "haveKilledDragon" to true
 	When
 	Player Action: Kill dragon.
 		
-2-	Quest event: 	if quest variable "haveKilledDragon" is true	=> 	Receive reward and finish quest. 
-					if quest variable "haveKilledDragon" is false	=> 	Get nothing
+Quest event #2: 	
+	if quest variable "haveKilledDragon" is true	=> 	Receive reward and finish quest. 
+	if quest variable "haveKilledDragon" is false	=> 	Get nothing
 	When
 	Player Action: Talking with King.
 	
 Note: Each quest also has default variables: 
-.complete		(if the quest is complete)
-.started		(if the quest was started. modifying a quest variable will set the started variable to true automatically)
+.active		(if the quest was started. you can only modify quest variables if the quest has been started by the player via the quest window. to open quest window for player: s.startQuest)
+.complete	(if the quest is complete)
 	
 ############
 Maps contain the information about what actors to create. 
 Some of these actors (ex: switch, dragon) may or may not be used for a quest event.
 
-Each actors has a series of attributes that can be used to turn them more than just a regular actor.
+Each actors has a series of attributes that can be used to turn them into more than just a regular actor.
 
+Ex:
 .deathFunc	:	Call quest event when dying.
 .dialogue	:	Call quest event when selecting talk option. Normally, this quest event will trigger a dialogue. 
 				Choosing an option in the dialogue can also trigger a quest event.
 .switch		:	Call quest event when selecting activate/deactivate option. 
+.loot		:	Call quest event when selecting loot option. 
+
+Full list can be found in /map.
 
 
 ############
@@ -122,14 +128,17 @@ In order for the game engine to know what account you want to access, you need t
 The key is always passed as the first parameter in any quest event you will create.
 
 
-getAct(key) will access the player variables
-	Ex: getAct(key).hp 		refers to the hp of the player corresponding to the key
+s.getAct(key) will access the player variables
+	Ex: s.getAct(key).hp 		refers to the hp of the player corresponding to the key
 
-get(key,'questVariableName') will access the quest variable	
-	Ex:	get(key,'haveKilledDragon')		refers to the value of the quest variable named "haveKilledDragon" for the player with this key
+s.get(key,'questVariableName') will access the quest variable	
+	Ex:	s.get(key,'haveKilledDragon')		refers to the value of the quest variable named "haveKilledDragon" for the player with this key
 
-set(key,'questVariableName',newValue) will change the value of a quest variable
-	Ex: set(key,'haveKilledDragon',true)	changed the value of the quest variable named "haveKilledDragon" to true for the player with this key
+s.set(key,'questVariableName',newValue) will change the value of a quest variable
+	Ex: s.set(key,'haveKilledDragon',true)	changes the value of the quest variable named "haveKilledDragon" to true for the player with this key
+
+	
+Full list of commands can be found in /event.
 	
 #############
 

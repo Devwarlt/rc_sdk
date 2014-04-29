@@ -6,10 +6,10 @@ Attack
 MAPS EVENTS:
 
 By default, a map is just a plain image.
-To bring life to the map, you will need to add an addon to it that will dictate what monsters/npc/lever to spawn.
+To bring life to the map, you will need to add an addon to it that will tell the engine what monsters/npc/lever to spawn.
 
 When creating a quest, you might also want to modify a pre-existing map. 
-To do that, you will create a new addon to pre-existing maps to modify them to your needs. 
+To do that, you will create a new addon to pre-existing maps to modify them to your needs.
 
 Always use the rc_sdk/map/creation/codeGenerator.html to get the addon template.
 
@@ -17,7 +17,7 @@ There are 3 different attributes for each addon: spot, load, loop.
 
 ADVANCED: 
 By default the name of the addon is your quest id.
-There's a fourth attribute .variable that can contain any type of variable. Access it via this.variable in load or loop functions. 
+There's a 4th attribute .variable that can contain any type of variable. Access it via this.variable in load or loop functions. 
 
 ####
 .spot: Object
@@ -48,32 +48,31 @@ Create Actor: (Enemy, Npc, Switch, Block, Cuttable Trees, Doors)
 	In order to create an enemy that has different attribute than the template, you need to specify the differences in the "extra" parameter.
 	
 	## Basic Examples ##
-	Actor.creation({
-		'xym':spot.c,				//enemy will spawn where the 'c' is on the tile project
-		"category":"goblin",		//template used will be the goblin-red one (assuming the template exists)
-		"variant":"red",
-		"extra":{},					//enemy exactly the same than the template since extra is empty
-	});
+	s.actor(
+		spot.c,			//spot:		enemy will spawn where the 'c' is on the tile project
+		"goblin",		//category:	template used will be the goblin-red one (assuming the template exists)
+		"red",			//variant: 	
+		{},				//extra:	enemy exactly the same than the template since extra is empty
+	);
 	
 	
-	Actor.creation({				
-		'xym':spot.c,				
-		"category":"goblin",		
-		"variant":"red",
-		"extra":{				//same enemy than above EXCEPT that this only has 9001 hp and moves slowly
+	s.actor(		
+		spot.c,				
+		"goblin",		
+		"red",
+		{				//same enemy than above EXCEPT that this only has 9001 hp and moves slowly
 			hp:9001,
 			maxSpd:0.001,
 		},					
-	});
+	);
 	
-	ADVANCED: For the list of "regular" actor extra (not-related to quest), check /server/db/Db_enemy.js
 	
 	In other to create a enemy that can respawn, the enemy needs to be in a group. Note: The group be be only 1 enemy.
 	
-	Actor.creation.group(			//create a group of monsters that respawns
+	s.actorGroup(			//create a group of monsters that respawns
 		{
 			'xym':spot.a,	
-			'respawn':100			//amount of frames before enemy group respawns (timer starts when last member is dead)
+			'respawn':100			
 		},
 		[
 			{							//first enemy type of the subgroup
@@ -90,6 +89,21 @@ Create Actor: (Enemy, Npc, Switch, Block, Cuttable Trees, Doors)
 			},		
 		]
 	);
+	s.actorGroup(
+		spot.e1,		//spot
+		25*15,			//amount of frames before enemy group respawns (timer starts when last member is dead)
+		[	
+			[
+				"orc",		//enemy category
+				"melee",	//enemy variant
+				2,			//amount
+				{}			//extra is applied to every monster of this type in that subgroup
+			],
+			["orc","range",1,{deathFunc:q.event.killOrc}],		//other subgroup
+			["orc","magic",5,{deathFunc:q.event.killOrc}],		//other subgroup
+		]	
+	);	
+	
 	
 	#####################
 	## Extra Parameter ##
@@ -104,10 +118,10 @@ Create Actor: (Enemy, Npc, Switch, Block, Cuttable Trees, Doors)
 				
 		//An example of what the quest event could be:
 		q.event.myDialogue = function(key){
-			if(get(key,'haveKilledDragon') === true){
-				dialogue(key,'Jenny','intro','intro2');
+			if(s.get(key,'haveKilledDragon') === true){
+				s.dialogue(key,'Jenny','intro','intro2');
 			} else {
-				dialogue(key,'Jenny','intro','intro0');
+				s.dialogue(key,'Jenny','intro','intro0');
 			}		
 		};
 		
@@ -115,20 +129,20 @@ Create Actor: (Enemy, Npc, Switch, Block, Cuttable Trees, Doors)
 	####
 	Event on Death (For Each killer):
 		Call quest event for each player who dealt 1+ dmg to this monster when this monster dies
-		PARAM: key | act: enemy who died object | map: mapId
+		PARAM: key | act: enemy who died object
 		---------------------
 		deathFunc:q.event.dragonKilled,
 		
 		//An example of what the quest event could be:
-		q.event.dragonKilled = function(key,act,map){
-			set(key,'haveKilledDragon',true);
+		q.event.dragonKilled = function(key,act){
+			s.set(key,'haveKilledDragon',true);
 		};		
 		
 	####
 	Switch
 		Call quest event when player activate/desactivate this actor. 
-		It starts in the "off" position. (Click it for first time will trigger "on" event)
-		RECOMMENDED: Use the enemy that has the category 'system' and the variant 'switch'
+		It starts in the "off" position. (Player activating it for first time will trigger "on" event)
+		RECOMMENDED: Use the enemy from category 'switch'	(Ex: switch,box)
 		
 		PARAM: key | act: enemy being clicked object | map: map object
 		---------------------
@@ -136,20 +150,20 @@ Create Actor: (Enemy, Npc, Switch, Block, Cuttable Trees, Doors)
 			on:q.event.unlockDoor,
 			off:q.event.lockDoor,
 		}
-			off:null		//once activated, the switch cant be desactivated.
+		//not specifying the "off" option means the switch can only be activated once
 		
 		
 		//An example of what the quest event could be:
 		q.event.unlockDoor = function(key,act,map){
-			set(key,'doorLocked',false);
+			s.set(key,'doorLocked',false);
 		};	
 		
 		
 		
 	####
-	Chest
-		an enemy that acts as a chest. can only be opened once. 	
-		RECOMMENDED: Use the enemy that has the category 'system' and the variant 'chest'
+	Loot
+		an enemy that acts as a chest/loot. can only be looted once per player. 	
+		RECOMMENDED: Use the enemy from category 'loot' (Ex: loot,chest)
 		
 		PARAM: key
 		RETURN: Boolean. Your quest event must return true if it was succesful, false otherwise. (Ex: if enough inventory space)
@@ -158,26 +172,31 @@ Create Actor: (Enemy, Npc, Switch, Block, Cuttable Trees, Doors)
 		
 		//An example of what the quest event could be:
 		q.event.giveMoney = function(key){
-			if(testItem(key,'gold',1000) === true){
-				addItem(key,'gold',1000);
+			if(s.testItem(key,'gold',1000) === true){	//if space for 1k gold
+				s.addItem(key,'gold',1000);	
 				return true;
 			} else {
 				return false;
 			}
 		} 
+		
+		ADVANCED:	This does the same thing.
+		q.event.giveMoney = function(key){
+			return s.testItem(key,'gold',1000,true);
+		}
 	
 	####
 	ViewedIf
 		condition to see the enemy. also affect collision (ex: if enemy is a block)
 		
-		PARAM: key | eId : enemy being seen id string
-		RETURN: Boolean. Your quest event must return true if the player can see, false otherwise.
+		PARAM: key | eid : enemy being seen id string
+		RETURN: Boolean. Your quest event must return true if the player can see the npc, false otherwise.
 		---------------------
 		viewedIf:q.event.canSeeRock,
 		
 		//An example of what the quest event could be:
-		q.event.canSeeRock = function(key,eId){
-			if(get(key,'explodedRock') === true){
+		q.event.canSeeRock = function(key,eid){
+			if(s.get(key,'brokeRock') === true){
 				return false;
 			} else {
 				return true;
@@ -200,9 +219,22 @@ Create Actor: (Enemy, Npc, Switch, Block, Cuttable Trees, Doors)
 		move:false,
 	
 		
+	ADVANCED: For the full list of actor extra (not-related to quest), check /server/Actor.init.js
 	
 	
+	####################
+	Create a block line:
+		Automatically create multiple actors (blocks) that like block the player. Useful for boss fight.
 	
+	s.block(
+		spot.b1,				//needs to be a zone (not a single point) needs to be 1xn or nx1
+		q.event.myCondition,	//viewedIf	(put null if no condition)
+		'spike',				//sprite name (default is 'spike')
+		{},						//extra
+	)
+	
+	
+
 
 ###################		
 LOOP COMMON FUNCTIONS
@@ -216,15 +248,12 @@ Call Quest Event if player is in a zone:
 	PARAM: 	0: spot zone. (should have been made with multiple letters in Tiled)
 			1: quest event to call
 	
-
-
-	
 	ex:
 	collision(spot.a,q.event.spawnEnemy);
 	
 	//An example of what the quest event could be:
 	q.event.damagePlayer = function(key){
-		getAct(key).hp -= 100;
+		s.getAct(key).hp -= 100;
 	} 
 	
 	
@@ -233,10 +262,10 @@ Call Quest Event if player is in a zone:
 Everything in the loop function will be called every frame. 
 However, for performance reasons, it is advised to use Loop.interval (not needed for teleZone and collision though)
 
-	Loop.interval(time)   return true every [time] frames.
+	s.interval(time)   return true every [time] frames.
 	
 Ex:
-if(Loop.interval(100)){		//do something... every 100 frames (every 4 seconds)
+if(s.interval(100)){		//do something... every 100 frames (every 4 seconds)
 	something...
 }
 	
@@ -263,28 +292,28 @@ Addon additional attributes:
 	####
 	.variable: Object
 		Contains custom variables. Those can be any type. Each map has its own copy of variables.
-			
+		Variables are rarely used....	NO DOCUMENTATION YET.	
 
 ###########################
 
-Actor extra attributes:		
+Advanced Extra attributes:		
 	###
 	Function on Click
 		set a function to call when player click on the enemy. onclick info will be added to optionList automatically
 		do NOT use right click (reserved for optionList)
 		
 		onclick:{
-			'shiftLeft':{
-				'func':function(key,param0,param1...){},
-				'param':['param0','param1',...]		
+			shiftLeft:{
+				func:q.event.myEvent,
+				param:[],		//unsure if param is needed.... put it incase XD
 			},
-			'left':same,
-			'shiftRight':same,			
+			left:same,
+			shiftRight:same,			
 		}
 		
 	####
 	Function on Death (Called once)
-		Called once whe monsters dies. killers is array of playerId. first element is guy who has the enemy drop
+		Called once whe monsters dies (unlike deathFunc that calls it for each player)		
 		PARAM: killers: array of player objects | mort: enemy who died object | map: mapId
 		
 		deathFuncArray:function(killers,mort,map){},			
@@ -303,30 +332,30 @@ Actor extra attributes:
 		
 	####
 	Condition to damage player
-		change who can be damaged by the attacks made this actor. check Combat.hitIf
+		change who can be damaged by the attacks made this actor. check Combat.damageIf
+		RETURN: Boolean
 		
-		hitIf:function(defObj,atkObj){
+		damageIf:function(defObj,atkObj){
 			return true if atkObj can damage defObj
 		},
-		hitIf:'enemy',		//can also be string and will refer to Combat.hitIf.list
+		damageIf:'enemy',		//can also be string and will refer to Combat.damageIf.list
+	
+	####
+	Condition be damaged
+		test if defObj can be a target of the enemy.
+		RETURN: Boolean
 		
+		damagedIf:function(defObj,atkObj){
+			return true if atkObj can target defObj
+		},	
+		damagedIf:'true',		//can also be string and will refer to Combat.damageIf.list
 	####
 	Condition to target player
 		test if defObj can be a target of the enemy.
+		RETURN: Boolean
 		
 		targetIf:function(defObj,atkObj){
 			return true if atkObj can target defObj
 		},	
 		
-###########################		
-Inside the load, you can also create drop:		
-	Create Drop:
-		Drop.creation({			//create a drop on the ground
-			'xym':spot.o,
-			"item":"gold",		//itemId
-			"amount":1,			//item amount
-			'timer':1/0			//how long it will stay on the ground b4 dissappearing
-			
-			'viewedIf':[],		//array containing the key of all players who can pick the drop
-			'viewedIf':true,	//can be seen/picked by everyone
-		});		
+	

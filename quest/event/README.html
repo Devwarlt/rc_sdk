@@ -23,49 +23,64 @@ ONCE THE QUEST WORKS
 #####################
 FUNCTIONS:
 Those are the main functions you can use in your quest events:
+(They all start by s.)
+
 
 Get a Quest Variable:
-	get(key,'questVariableName');					Ex:		get(key,'haveKilledDragon');
+	s.get(key,'questVariableName');					Ex:		s.get(key,'haveKilledDragon');
 	
 Change a Quest Variable:
-	set(key,'questVariableName',value);				Ex: 	set(key,'haveKilledDragon',true);
+	s.set(key,'questVariableName',value);				Ex: 	s.set(key,'haveKilledDragon',true);
 	
 Add Item:
-	addItem(key,'itemId',amount);					Ex: 	addItem(key,'gold',100);
+	s.addItem(key,'itemId',amount);					Ex: 	s.addItem(key,'gold',100);
 	
 Remove Item:
-	removeItem(key,'itemId',amount);				Ex: 	removeItem(key,'gold',10);
+	s.removeItem(key,'itemId',amount);				Ex: 	s.removeItem(key,'gold',10);
 
 Verify if the player has item (return boolean):		
-	haveItem(key,'itemId',amount);					Ex:		if(haveItem(key,'gold',5)){ ... };
+	s.haveItem(key,'itemId',amount);					Ex:		if(s.haveItem(key,'gold',5)){ ... };
 
 Test if enough inventory space for items (return boolean):		
-	testItem(key,'itemId',amount);					Ex:		if(testItem(key,'gold',5)){ ... };	
+	s.testItem(key,'itemId',amount);					Ex:		if(s.testItem(key,'gold',5)){ ... };	
 	
 Teleport a player:
-	teleport(key,'mapId','spotLetter');				Ex:		teleport(key,'dragonLair','a');
+	s.teleport(key,'mapId','spotLetter');				Ex:		s.teleport(key,'dragonLair','a');
 	
 Start a dialogue:
-	dialogue(key,'npcId','convoId','nodeId');		Ex:		dialogue(key,'villager','giveQuest','intro');
+	s.dialogue(key,'npcId','convoId','nodeId');		Ex:		s.dialogue(key,'villager','giveQuest','intro');
 	
 Add regular text in Chat Box:
-	chat(key,'text');								Ex:		chat(key,'This villager seems to need help.');
+	s.chat(key,'text');								Ex:		s.chat(key,'This villager seems to need help.');
 
-Prevent player from moving (# of frames):
-	freeze(key,time);								Ex: 	freeze(key,25*10);
+Pop Quest Window:
+	s.startQuest(key);								Ex: 	s.startQuest(key);
 
-Allow a frozen player to move again:
-	unfreeze(key);									Ex: 	unfreeze(key);
 
+	
+	
+	
+	
+	
+	
+	
+	
+
+	
+	
+	
+	
+	
+	
 
 
 ### Examples: ###
 
 q.event.teleportDragonLair = function(key){
-	teleport(key,'dragonLair','a');								//teleport player in dragonLair in spot a.
-	chat(key,'You have been teleport to the dragon lair.');		//display message
-	addItem(key,'fireShield',1);								//give him a fireShield
-	set(key,'insideDragonLair',true);							//set quest variable insideDragonLair to true.
+	s.teleport(key,'dragonLair','a');								//teleport player in dragonLair in spot a.
+	s.chat(key,'You have been teleport to the dragon lair.');		//display message
+	s.addItem(key,'fireShield',1);								//give him a fireShield
+	s.set(key,'insideDragonLair',true);							//set quest variable insideDragonLair to true.
 };
 
 
@@ -74,31 +89,95 @@ q.event.teleportDragonLair = function(key){
 #####################################
 ADVANCED:
 
-teleport(key,'mapId','spotLetter',popup);
-	if mapId has no @ 		=>	main instance 
-	if mapId ends with @ 	=> 	team instance
-	if mapId ends with @@	=>	solo instance
+Teleport:
+	s.teleport(key,'mapId','spotLetter',popup);
+		if mapId has no @ 		=>	main instance 
+		if mapId ends with @ 	=> 	team instance
+		if mapId ends with @@	=>	solo instance
 
-	spotLetter: only have access to the spots that are part of a map addon related to the quest
+		spotLetter: only have access to the spots that are part of a map addon related to the quest
 
-	popup = 0	=> teleport player instantly
-	popup = 1 	=> popup a confirmation box. player can also choose the instance they want
+		popup = 0	=> teleport player instantly	(default)
+		popup = 1 	=> popup a confirmation box. player can also choose the instance they want
+
+
+Items Other formats:
+	s.addItem(key,{myItem:1,otherItem:3});
+	s.removeItem(key,{myItem:1,otherItem:3});
+	
+	s.haveItem(key,{myItem:1,otherItem:3});
+	s.testItem(key,{myItem:1,otherItem:3});
+
+	s.haveItem(key,{myItem:1,otherItem:3},true);	//true => if have the items, remove the items and return true
+	s.testItem(key,{myItem:1,otherItem:3},true);	//true => if enough space for items, add the items and return true
+		
+		
+		
+Prevent player from moving (# of frames):
+	s.freeze(key,time);								Ex: 	s.freeze(key,25*10);
+
+Allow a frozen player to move again:
+	s.unfreeze(key);								Ex: 	s.unfreeze(key);
+
+Get Player Object:
+	s.getAct(key);									Ex: 	s.getAct(key).hp += 100;
+	
+Change Player Sprite:
+	s.setSprite(key,name,sizeMod);					Ex:		s.setSprite(key,'orc-melee',2);
+
+Call Event in Future:		
+	s.setTimeout(key,name,time,event);				Ex: 	s.setTimeout(key,'cutsceneEnd',25*10,q.event.csOutBoss);
+
+Boost an actor:
+	s.boost(key,boost);								Ex:		s.boost(key,[{'stat':'globalDef','type':"*",'value':10,'time':250,'name':'bossPhase2'}]);
+
+Start a cutscene (aka following a path)
+	s.cutscene(key,map,path);						Ex:		s.cutscene(key,'goblinLand','blue');
+	
+Get Npc (return first npc in the map with this tag (set via extra))	
+	s.getNpc(key,tag);								Ex:		s.getNpc(key,'boss');	
+	
+Set Respawn (isSafe: will teleport there even if map no longer exist):
+	s.setRespawn(key,map,letter,isSafe);			Ex:		s.setRespawn(key,'goblinLand','n1',false);
+	
+//s.question
+
+
 ----------------
 
 Reserved variable names (Do not use those):
-	hint,rewardTier,reward,complete,started,deathCount,bonus,challenge,requirement,skillPlot
+	hint,rewardPt,rewardScore,complete,active,deathCount,bonus,challenge,challengeDone,requirement,skillPlot
 
 Special quest event names:
-	test:		event called when starting server (need to set Quest.test = QUESTID)
+	
 	start: 		event called automatically when starting the quest
+	death: 		event called automatically when dying
 	abandon:	event called automatically when abandoning quest
-
+	signIn:		event called automatically when player signs in after logging out
+	
+	//for testing (need to set Quest.test = [YOURQUESTID])
+	test:{
+		signIn:			event called when logging in	(ex: teleport next to npc that gives quest)
+		firstSignIn:	event called when logging in for first time
+	}
+	
+	
 Items:
 	You can only add/remove items that you created exclusively for your quest.
 
 
 
 
+	
+	
+	
+	
+	
+	
+
+
+	
+	
 
 
 
