@@ -48,7 +48,7 @@ Create Actor: (Enemy, Npc, Switch, Block, Cuttable Trees, Doors)
 	In order to create an enemy that has different attribute than the template, you need to specify the differences in the "extra" parameter.
 	
 	## Basic Examples ##
-	s.actor(
+	m.actor(
 		spot.c,			//spot:		enemy will spawn where the 'c' is on the tile project
 		"goblin",		//category:	template used will be the goblin-red one (assuming the template exists)
 		"red",			//variant: 	
@@ -56,7 +56,7 @@ Create Actor: (Enemy, Npc, Switch, Block, Cuttable Trees, Doors)
 	);
 	
 	
-	s.actor(		
+	m.actor(		
 		spot.c,				
 		"goblin",		
 		"red",
@@ -69,7 +69,7 @@ Create Actor: (Enemy, Npc, Switch, Block, Cuttable Trees, Doors)
 	
 	In other to create a enemy that can respawn, the enemy needs to be in a group. Note: The group be be only 1 enemy.
 	
-	s.actorGroup(			//create a group of monsters that respawns
+	m.actorGroup(			//create a group of monsters that respawns
 		{
 			'xym':spot.a,	
 			'respawn':100			
@@ -89,7 +89,7 @@ Create Actor: (Enemy, Npc, Switch, Block, Cuttable Trees, Doors)
 			},		
 		]
 	);
-	s.actorGroup(
+	m.actorGroup(
 		spot.e1,		//spot
 		25*15,			//amount of frames before enemy group respawns (timer starts when last member is dead)
 		[	
@@ -99,8 +99,8 @@ Create Actor: (Enemy, Npc, Switch, Block, Cuttable Trees, Doors)
 				2,			//amount
 				{}			//extra is applied to every monster of this type in that subgroup
 			],
-			["orc","range",1,{deathFunc:q.event.killOrc}],		//other subgroup
-			["orc","magic",5,{deathFunc:q.event.killOrc}],		//other subgroup
+			["orc","range",1,{deathEvent:q.event.killOrc}],		//other subgroup
+			["orc","magic",5,{deathEvent:q.event.killOrc}],		//other subgroup
 		]	
 	);	
 	
@@ -131,59 +131,13 @@ Create Actor: (Enemy, Npc, Switch, Block, Cuttable Trees, Doors)
 		Call quest event for each player who dealt 1+ dmg to this monster when this monster dies
 		PARAM: key | act: enemy who died object
 		---------------------
-		deathFunc:q.event.dragonKilled,
+		deathEvent:q.event.dragonKilled,
 		
 		//An example of what the quest event could be:
 		q.event.dragonKilled = function(key,act){
 			s.set(key,'haveKilledDragon',true);
 		};		
-		
-	####
-	Switch
-		Call quest event when player activate/desactivate this actor. 
-		It starts in the "off" position. (Player activating it for first time will trigger "on" event)
-		RECOMMENDED: Use the enemy from category 'switch'	(Ex: switch,box)
-		
-		PARAM: key | act: enemy being clicked object | map: map object
-		---------------------
-		switch:{		
-			on:q.event.unlockDoor,
-			off:q.event.lockDoor,
-		}
-		//not specifying the "off" option means the switch can only be activated once
-		
-		
-		//An example of what the quest event could be:
-		q.event.unlockDoor = function(key,act,map){
-			s.set(key,'doorLocked',false);
-		};	
-		
-		
-		
-	####
-	Loot
-		an enemy that acts as a chest/loot. can only be looted once per player. 	
-		RECOMMENDED: Use the enemy from category 'loot' (Ex: loot,chest)
-		
-		PARAM: key
-		RETURN: Boolean. Your quest event must return true if it was succesful, false otherwise. (Ex: if enough inventory space)
-		---------------------
-		chest:q.event.giveMoney,
-		
-		//An example of what the quest event could be:
-		q.event.giveMoney = function(key){
-			if(s.testItem(key,'gold',1000) === true){	//if space for 1k gold
-				s.addItem(key,'gold',1000);	
-				return true;
-			} else {
-				return false;
-			}
-		} 
-		
-		ADVANCED:	This does the same thing.
-		q.event.giveMoney = function(key){
-			return s.testItem(key,'gold',1000,true);
-		}
+				
 	
 	####
 	ViewedIf
@@ -226,21 +180,99 @@ Create Actor: (Enemy, Npc, Switch, Block, Cuttable Trees, Doors)
 	Create a block line:
 		Automatically create multiple actors (blocks) that like block the player. Useful for boss fight.
 	
-	s.block(
+	m.block(
 		spot.b1,				//needs to be a zone (not a single point) needs to be 1xn or nx1
 		q.event.myCondition,	//viewedIf	(put null if no condition)
 		'spike',				//sprite name (default is 'spike')
 		{},						//extra
 	)
+	####################
+	Create a teleport:	(Door, Teleport Zone, staircase)
+		Call quest event when player use the teleport option of this actor.
+		
+	m.teleport(
+		spot.b1,						//spot
+		q.event.teleportEvent,			//event called, normally teleporting the player	(PARAM: key | e: switch being clicked object)
+		'zone',							//appearance ('zone','door','underground')
+		{},								//extra	(ex: viewedIf)
+	);
 	
+				
+	//An example of what the quest event could be:
+	q.event.teleportEvent = function(key,e,map){
+		if(s.get(key,'doorLocked') === true){
+			s.chat(key,"The door is locked.");
+		} else {
+			s.teleport(key,'dragonLair','t1');
+		}
+		
+	};	
 	
-
-
+	####################
+	Create a toggle (switch):
+		Call quest event when player activate/desactivate this actor. 
+		It starts in the "off" position. (Player activating it for first time will trigger "turnOn" event)
+		
+	m.toggle(
+		spot.b1,						//spot
+		q.event.displayOffCondition,	//event that RETURN BOOLEAN. if true, display the Off-Switch (the switch that will trigger the q.event.turnOn)
+										//normally, if player hasn't activated it yet, it should return true.		(PARAM: key)		
+		q.event.turnOn,					//event called when activating the Off-Switch		(PARAM: key | e: switch being clicked object | map: map object)
+		q.event.turnOff,				//event called when desactivating the On-Switch		(PARAM: key | e: switch being clicked object | map: map object)
+		{},								//extra for offSwitch
+		{}								//extra for onSwitch
+	);
+	
+	//putting null for the "q.event.turnOff" means the switch can only be activated once
+				
+	//An example of what the quest event could be:
+	q.event.displayOffCondition = function(key,e,map){
+		return s.get(key,'doorLocked') === true;
+	};
+	q.event.turnOn = function(key,e,map){
+		s.set(key,'doorLocked',false);
+	};	
+	q.event.seeDoor = function(key,e,map){			//linked to the door viewedIf (not the switch)
+		return s.get(key,'doorLocked') === true;
+	};	
+	
+	####################
+	Create a loot (chest):
+		Create an enemy that acts as a chest/loot. can only be looted once per player. 	
+		
+	
+	m.loot(
+		spot.b1,						//spot
+		q.event.displayUnopened,	//event that RETURN BOOLEAN. if true, display the unopened chest
+		q.event.openChest,			//event called when opening the chest		(PARAM: key | e: chest being opened object)
+		'chest',					//appearance
+		{},							//extra for chestOff
+		{}							//extra for chestOn
+	);
+	
+	//An example of what the quest event could be:
+	q.event.openChest = function(key){
+		if(s.testItem(key,'gold',1000) === true){	//if space for 1k gold
+			s.addItem(key,'gold',1000);	
+			s.set(key,"openedChest",true);
+			return true;
+		} else {
+			return false;
+		}
+	} 
+	q.event.displayUnopened = function(key,e,map){
+		return s.get(key,'openedChest') === false;
+	};	
+	
+	### ADVANCED:	This does the same thing.
+	q.event.openChest = function(key){
+		return s.testItem(key,'gold',1000,true,"openedChest");
+	}
+		
+		
 ###################		
 LOOP COMMON FUNCTIONS
 
-
-	
 ####
 Call Quest Event if player is in a zone:
 	If a player is in that zone, call a quest event.
@@ -249,7 +281,7 @@ Call Quest Event if player is in a zone:
 			1: quest event to call
 	
 	ex:
-	collision(spot.a,q.event.spawnEnemy);
+	m.collision(spot.a,q.event.spawnEnemy);
 	
 	//An example of what the quest event could be:
 	q.event.damagePlayer = function(key){
@@ -260,7 +292,7 @@ Call Quest Event if player is in a zone:
 	
 	
 Everything in the loop function will be called every frame. 
-However, for performance reasons, it is advised to use Loop.interval (not needed for teleZone and collision though)
+However, for performance reasons, it is advised to use s.interval
 
 	s.interval(time)   return true every [time] frames.
 	
@@ -313,10 +345,10 @@ Advanced Extra attributes:
 		
 	####
 	Function on Death (Called once)
-		Called once whe monsters dies (unlike deathFunc that calls it for each player)		
+		Called once whe monsters dies (unlike deathEvent that calls it for each player)		
 		PARAM: killers: array of player objects | mort: enemy who died object | map: mapId
 		
-		deathFuncArray:function(killers,mort,map){},			
+		deathEventArray:function(killers,mort,map){},			
 		
 	####
 	Delete On Death:

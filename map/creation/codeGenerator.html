@@ -97,19 +97,19 @@ readFiles.script.normal = function(content){
 	'q.map.' + name  +
 	
 	' = function(){' + '<br>' +
-	'&#9;' + 'var m = s.map();' + '<br>' + 
-	'&#9;' + 'm.name = "' + name.capitalize() + '";' + '<br>' +
-	'&#9;' + 'm.graphic = "' + name + '";' + '<br>' +
-	'&#9;' + 'm.lvl = 0;' + '<br>' +
-	'&#9;' + 'm.tileset = "' + version + '";' + '<br>' +
-	'&#9;' + 'm.grid = ' + collisionData.toString() + '<br>' +
-	'&#9;' + 'var a = m.addon[q.id] = {};' + '<br>' +
+	'&#9;' + 'var map = m.map();' + '<br>' + 
+	'&#9;' + 'map.name = "' + name.capitalize() + '";' + '<br>' +
+	'&#9;' + 'map.graphic = "' + name + '";' + '<br>' +
+	'&#9;' + 'map.lvl = 0;' + '<br>' +
+	'&#9;' + 'map.tileset = "' + version + '";' + '<br>' +
+	'&#9;' + 'map.grid = ' + collisionData.toString() + '<br>' +
+	'&#9;' + 'var a = map.addon[q.id] = {};' + '<br>' +
 	'&#9;' + 'a.spot = ' + JSON.stringify(zoneData) + '<br>' +
 	'&#9;' + 'a.path = ' + JSON.stringify(cutsceneData) + '<br>' +
 	'&#9;' + 'a.variable = {}; <br>' +
 	'&#9;' + 'a.load = function(spot){} <br>' +
 	'&#9;' + 'a.loop = function(spot){} <br>' +
-	'&#9;' + 'return m;' + '<br>' +
+	'&#9;' + 'return map;' + '<br>' +
 	'};' + '</pre>'
 
 	document.getElementById('show').innerHTML = str;

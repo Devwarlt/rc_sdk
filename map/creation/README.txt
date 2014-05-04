@@ -111,7 +111,7 @@ name.tmx 	=> 		project saved with default format (BAD format) dont save it that 
 nameA.png 	=> 		entire map image Above player
 nameB.png 	=> 		entire map image Below player
 
-nameA_(0,0) =>		640x320 region in the top left corner of the screen, Above the player	(generated via cropping.bat)
+nameA_(X,Y) =>		640x320 region in the top left corner of the screen, Above the player	(generated via cropping.bat)
 nameM.png 	=> 		Minimap image x16 smaller than fullsize map								(generated via cropping.bat)
 
 
