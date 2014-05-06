@@ -2,7 +2,7 @@ q.dialogue['jenny'] = {
 	'face':{'image':'warrior-male.0','name':'Jenny'},
 	'convo0':{
 		'intro':{
-			'text':"If you manage to kill all the different types of monsters, I'll give you something special.",
+			'text':"If you manage to kill all the different types of monsters, I'll give you something very special.",
 			'option':[
 				{'text':"Bee!",'func':q.event.changeSprite},
 			]
