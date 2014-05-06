@@ -145,18 +145,19 @@ Set Respawn (isSafe: will teleport there even if map no longer exist):
 
 ----------------
 
-Reserved variable names (Do not use those):
-	hint,rewardPt,rewardScore,complete,active,deathCount,bonus,challenge,challengeDone,requirement,skillPlot
-
-Special quest event names:
+Special quest event names: (PARAM KEY)
 	
-	start: 		event called automatically when starting the quest
-	death: 		event called automatically when dying
-	abandon:	event called automatically when abandoning quest
-	signIn:		event called automatically when player signs in after logging out
+	_start: 		event called automatically when starting the quest
+	_death: 		event called automatically when dying
+	_abandon:		event called automatically when abandoning quest
+	_signIn:		event called automatically when player signs in after logging out
+	_complete:		event called automatically when successfully completing a quest	
+	_hint:			RETURN STRING, event that returns what is the current hint
+	_highscore:		RETURN OBJECT, event that returns an object. the attributes are the highscore categories, values are the score. {enemyKilledIn1Min:123}
 	
+		
 	//for testing (need to set Quest.test = [YOURQUESTID])
-	test:{
+	_test:{
 		signIn:			event called when logging in	(ex: teleport next to npc that gives quest)
 		firstSignIn:	event called when logging in for first time
 	}
