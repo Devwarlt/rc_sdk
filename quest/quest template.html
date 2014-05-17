@@ -1,22 +1,39 @@
 This is a quest template. The name of the file should be [yourQuestId].js
 <script> Select Everything Below vvvvv
 
+/* 
+    QUEST DESCRIPTION
+    Miscellaneous information relative to the quest
+*/
 
-
-var q = Quest.template('Qtutorial','v1.1');		//first param is the quest id. it must always start by Q
+var q = Quest.template('Qtutorial','v1.1');		//First parameter is the quest id. It must always start with Q
 eval(Quest.template.eval(q));
 
-q.name = 'Tutorial';
-q.icon = 'skill.melee';		//check /server/client/img.js for list of all possible icons
+q.name = 'Tutorial';        //Name of the quest
+q.icon = 'skill.melee';		//Attributes an icon to the quest
+                            //Check /server/client/img.js for a list of all possible icons
 	
-q.description = "Raining Chain Tutorial";
+q.description = "Raining Chain Tutorial";       //Brief descritpion of the quest
 
-q.variable = {				//quest variables
-	attribute1:true,
+/*
+    QUEST VARIABLES
+    Quest variables allow quest progression, event triggering, etc...
+    All quest variables are boolean (true OR false)
+*/
+
+q.variable = {				
+    attribute1:true,
 	haveKilledDragon:false,
 };
+
+/*
+    QUEST EVENTS
+    Quest events are all functions, where the 'key' is a quest variable
+    Quest events make the quest actively progress
+    Quest events may be a player teleportation, a cutscene, a dialogue, etc...
+*/
 	
-q.event = {					//quest events
+q.event = {					
 	teleportDragonLair:function(key){
 		//...
 	},
@@ -27,14 +44,28 @@ q.event = {					//quest events
 	}
 }
 
+/*
+    QUEST ITEMS
+    Items gained or used through the quest are declared here
+    Must start with [questId]-
+*/
 
-q.item['key'] = {
-	//...
+q.item['Qtutorial-key'] = {           
+	name:'Key',				    //name of item
+	icon:'system.gold',			//icon used, check /client/js/img.js
+	stack:true,					//only use 1 inventory slot when multiple instances of the item in possession
+	trade:true, 				//can be traded
+	drop:true,					//can be dropped
+	remove:false,				//remove item when used
+	bank:true,					//can be put in a bank
+	type:'item',				//leave that way. do not touch
 };	
 
-
-		
-
+/*
+    QUEST DIALOGUE
+    
+*/
+        
 q.dialogue['jenny'] = {'face':'Jenny',
 	'intro':{
 		'intro0':{
@@ -91,7 +122,7 @@ q.map.tutorial = function(){
 
 exports.quest = q;
 
-
+</script>
 
 
 
