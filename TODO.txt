@@ -1,0 +1,33 @@
+TODO List for the SDK:
+
+QUEST:
+-Requirement
+-Challenge
+-Highscore
+-Boss
+-Ability
+-Enemy
+-More info about s.teamForEach
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

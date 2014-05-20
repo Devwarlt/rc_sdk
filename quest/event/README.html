@@ -2,7 +2,7 @@
 
 STEPS:
 
-1- Think of the quest events and write them down with their intermediate.
+1- Think of the quest events and write them down with their player action.
 2- Code the quest events with the functions below.
 3- Write the key dialogues.
 4- Test the quest via the test-event.html file.
@@ -13,24 +13,24 @@ ONCE THE QUEST WORKS
 8- Test the quest via your nodejs server. (check quest/testing)
 ONCE THE QUEST WORKS
 9- Polish.
-	Add "useless" map decoration.
-	Add "useless" dialogue.
-	Add "useless" enemies.
+	Add non-essential map decoration.
+	Add non-essential dialogue.
+	Add non-essential enemies.
 10- Test the final version of the quest.
 
 
 
 #####################
 FUNCTIONS:
-Those are the main functions you can use in your quest events:
-(They all start by s.)
+Those are the main functions you can use in your quest events. They all start by s.
 
+###BASIC USAGE:###
 
 Get a Quest Variable:
 	s.get(key,'questVariableName');					Ex:		s.get(key,'haveKilledDragon');
 	
 Change a Quest Variable:
-	s.set(key,'questVariableName',value);				Ex: 	s.set(key,'haveKilledDragon',true);
+	s.set(key,'questVariableName',value);			Ex: 	s.set(key,'haveKilledDragon',true);
 	
 Add Item:
 	s.addItem(key,'itemId',amount);					Ex: 	s.addItem(key,'gold',100);
@@ -45,7 +45,7 @@ Test if enough inventory space for items (return boolean):
 	s.testItem(key,'itemId',amount);					Ex:		if(s.testItem(key,'gold',5)){ ... };	
 	
 Teleport a player:
-	s.teleport(key,'mapId','spotLetter');				Ex:		s.teleport(key,'dragonLair','a');
+	s.teleport(key,'mapId','spotLetter');	Ex:		s.teleport(key,'dragonLair','a');
 	
 Start a dialogue:
 	s.dialogue(key,'npcId','convoId','nodeId');		Ex:		s.dialogue(key,'villager','giveQuest','intro');
@@ -56,17 +56,6 @@ Add regular text in Chat Box:
 Pop Quest Window:
 	s.startQuest(key);								Ex: 	s.startQuest(key);
 
-
-	
-	
-	
-	
-	
-	
-	
-	
-
-	
 	
 	
 	
@@ -102,19 +91,19 @@ Teleport:
 
 
 Items Other formats:
-	s.addItem(key,{myItem:1,otherItem:3});
-	s.removeItem(key,{myItem:1,otherItem:3});
+	s.addItem(key,{firstItem:1,otherItem:3});
+	s.removeItem(key,{firstItem:1,otherItem:3});
 	
-	s.haveItem(key,{myItem:1,otherItem:3});
-	s.testItem(key,{myItem:1,otherItem:3});
+	s.haveItem(key,{firstItem:1,otherItem:3});
+	s.testItem(key,{firstItem:1,otherItem:3});
 
-	s.haveItem(key,{myItem:1,otherItem:3},true);	//true => if have the items, remove the items and return true
-	s.testItem(key,{myItem:1,otherItem:3},true);	//true => if enough space for items, add the items and return true
+	s.haveItem(key,{firstItem:1,otherItem:3},true);	//true => if have the items, remove the items and return true
+	s.testItem(key,{firstItem:1,otherItem:3},true);	//true => if enough space for items, add the items and return true
 		
 		
 		
-Prevent player from moving (# of frames):
-	s.freeze(key,time);								Ex: 	s.freeze(key,25*10);
+Prevent player from moving (# of frames) (Server = 25 FPS) Done done, call the event. :
+	s.freeze(key,time,event);					Ex: 	s.freeze(key,25*10,q.event.cutsceneDone);
 
 Allow a frozen player to move again:
 	s.unfreeze(key);								Ex: 	s.unfreeze(key);
@@ -140,9 +129,14 @@ Get Npc (return first npc in the map with this tag (set via extra))
 Set Respawn (isSafe: will teleport there even if map no longer exist):
 	s.setRespawn(key,map,letter,isSafe);			Ex:		s.setRespawn(key,'goblinLand','n1',false);
 	
-//s.question
-
-
+Call function for everyone in same team:
+	s.teamForEach(key,testEvent,eventAction);		Ex: 	s.teamForEach(key,q.event.haveKilledBoss,q.event.teleportOutsideOfBossRoom);
+	
+	if testEvent is true for every player in team, it calls eventAction for every player.
+	
+Opens Highscore Window:
+	s.highscoreWindow(key,category);				Ex: 	s.highscoreWindow(key,'fastest-time');
+	
 ----------------
 
 Special quest event names: (PARAM KEY)
@@ -153,7 +147,6 @@ Special quest event names: (PARAM KEY)
 	_signIn:		event called automatically when player signs in after logging out
 	_complete:		event called automatically when successfully completing a quest	
 	_hint:			RETURN STRING, event that returns what is the current hint
-	_highscore:		RETURN OBJECT, event that returns an object. the attributes are the highscore categories, values are the score. {enemyKilledIn1Min:123}
 	
 		
 	//for testing (need to set Quest.test = [YOURQUESTID])
@@ -162,22 +155,56 @@ Special quest event names: (PARAM KEY)
 		firstSignIn:	event called when logging in for first time
 	}
 	
+	_getScoreMod:		RETURN NUMBER, event that returns a global modifier for the passive score obtained from this quest.
+	
 	
 Items:
-	You can only add/remove items that you created exclusively for your quest.
+	You can only add/remove items that you created exclusively for your quest. (Via q.item)
 
 
 
+Naming Convention:
+	EVENTS:
+	
+	Teleport:	tele[In or Out][Where]
+		Ex: teleInCamp, teleOutLair
+	
+	Cutscene:	cs[In or Out or Test][Info]
+		Ex: csInBoss, csOutVillage, csTest
+		
+	Item (When adding):	get[Item]
+		Ex:	getFlower, getPotion
+	
+	Item Event:	item[Item][Effect]
+		Ex: itemPotionDrink, itemShieldEquip,
+	
+	Enemy Death: kill[Enemy]
+		Ex: killGoblin, killDragon
+		
+	Dialogue: talk[Who]
+		Ex: talkRingo, talkBob
+	
+	Toggle: tg[On or Off][What it affects]
+		Ex:	tgOnDoor,	tgOnGate,
+	
+	ViewedIf:	view[What]
+		Ex: viewChest, viewBoss
+	
+	
+	###########
+	VARIABLES:	
+	
+	Enemy Death: kill[Enemy]	(NUMBER)
+		Ex: killGoblin, killDragon
+	
+	Dialogue: talk[Who]			(BOOLEAN)
+		Ex: talkRingo, talkBob
+	
+	Cutscene:	cs[In or Out][Info]	(BOOLEAN)
+		Ex: csInBoss, csOutVillage
 
-	
-	
-	
-	
-	
-	
-
-
-	
+	Toggle: tg[On or Off][What it affects]	(BOOLEAN)
+		Ex:	tgOnDoor,	tgOnGate,
 	
 
 

@@ -6,13 +6,14 @@ This guide assumes you will use enemy/sprites/anim/icons already present in the 
 You can check quest examples in the submissionExample folder. (RECOMMENDED)
 
 ####################################
-In order to use any .html file in this SDK that starts with "test-" (ex: test-dialogue.html), drag the file into a new google chrome browser page.
+In order to use any .html file in this SDK that starts with "test-" (ex: test-dialogue.html), drag the file into a new Google Chrome browser page.
 
 ####################################
 A quest submission must include everything needed in order for the quest to work.
 
 This can include:
--Map (Image, Grid, Events)
+-Quest Events
+-Map (Image, Grid)
 -Dialogue
 -Items
 
@@ -41,12 +42,20 @@ SUMMARY:
 GAME ENGINE BASICS:
 
 There are 3 types of entities that interacts with the player:
-1- Actor: 	Enemy, Player, Npc, Switch, Block, Cuttable Trees, Doors 
+***1- Actor: 	Enemy, Player, Npc, Switch, Block, Cuttable Trees, Doors***
 2- Attack: 	Bullet, Strike
 3- Drop: 	Items on the ground
 
 The only entity we will use for quests is the ACTOR.
 
+Actor are split in 2 categories:
+	PLAYER: 
+	
+	NPC: Represent ALL computer-controlled characters. (Either they are friendly or not to the player.)
+		Combat-NPC:	Can attack, target another actor, die. (Require more info to be functional)
+		Non-Combat NPC:	Can't.
+		
+			
 ##################
 QUEST CONCEPT:
 
@@ -71,7 +80,7 @@ Examples:
 	
 The same quest event may be linked with multiple player actions.
 
-Quest events can be accessed via q.event.  (Will be more clear later)
+All Quest events are in "q.event".  (Will be more clear later)
 
 ############
 
@@ -82,7 +91,7 @@ Most quest events will access/modify those values.
 Example:
 
 custom quest variables list:
-	"haveKilledDragon" (set default to false)
+	"haveKilledDragon" = false 		(default is false)
 
 Quest event #1: 
 	Set quest variable "haveKilledDragon" to true
@@ -94,10 +103,8 @@ Quest event #2:
 	if quest variable "haveKilledDragon" is false	=> 	Get nothing
 	When
 	Player Action: Talking with King.
-	
-Note: Each quest also has default variables: 
-.active		(if the quest was started. you can only modify quest variables if the quest has been started by the player via the quest window. to open quest window for player: s.startQuest)
-.complete	(if the quest is complete)
+
+The Javascript coding syntax will be explained later in /quest/event.
 	
 ############
 Maps contain the information about what actors to create. 
@@ -106,11 +113,11 @@ Some of these actors (ex: switch, dragon) may or may not be used for a quest eve
 Each actors has a series of attributes that can be used to turn them into more than just a regular actor.
 
 Ex:
-.deathEvent	:	Call quest event when dying.
-.dialogue	:	Call quest event when selecting talk option. Normally, this quest event will trigger a dialogue. 
+.deathEvent	:	Call quest event when dying.	(Ex: Monster)
+.dialogue	:	Call quest event when selecting talk option. Normally, this quest event will trigger a dialogue. 	(Ex: NPC)
 				Choosing an option in the dialogue can also trigger a quest event.
-.switch		:	Call quest event when selecting activate/deactivate option. 
-.loot		:	Call quest event when selecting loot option. 
+.toggle		:	Call quest event when selecting activate/deactivate option. 	(Ex: Switch)
+.loot		:	Call quest event when selecting loot option.	(Ex: Chest) 
 
 Full list can be found in /map.
 
@@ -138,7 +145,7 @@ s.set(key,'questVariableName',newValue) will change the value of a quest variabl
 	Ex: s.set(key,'haveKilledDragon',true)	changes the value of the quest variable named "haveKilledDragon" to true for the player with this key
 
 	
-Full list of commands can be found in /event.
+Full list of commands can be found in /quest/event.
 	
 #############
 

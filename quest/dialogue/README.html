@@ -25,7 +25,7 @@ Each node also has properties such as:
 			Selecting an option will change the current dialogue. 
 			Options can also trigger custom functions that will be used when making quests. (Ex: give an item)
 	
-	func:	Quest Event to call when player accesses this dialogue
+	event:	Quest Event to call when player accesses this dialogue.
 	
 ###
 Each face has the properties:
@@ -47,7 +47,7 @@ Each option has the properties:
 	next:	Reference to the next dialogue to display if the player chooses this option.
 			Ex: {npc:'bob',convo:'introduction',node:'giveQuest'}
 	
-	func:	Quest Event to call when player chooses this option
+	event:	Quest Event to call when player chooses this option.
 			
 	
 #################
@@ -111,29 +111,29 @@ If next is not defined at all, the dialogue ends.
 #### Quest Events #####
 
 ## 3: Text with options with quest events
-The param "func" contains the quest event to trigger if the player chooses that option.
+The param "event" contains the quest event to trigger if the player chooses that option.
 
 node0:{
 	text:"Would you like to be teleported to the dragon lair?",
 	face:"none",
 	option:[
 		{text:"Yes.",
-			func:q.event.teleportDragonLair
+			event:q.event.teleportDragonLair
 		},
 		{text:"No."},
 	],
 },
 
 ### 
+Functions can also be directly linked with the node. Called when dialogue starts. (no options needed)
 
 node0:{
 	text:"Hello, I found your ring.",
 	face:"player",
-	func:q.event.giveRing
+	event:q.event.giveRing
 }
 
-Functions can also be directly linked with the node. (no options needed)
-
+ADVANCED: Make sure the q.dialogue is after the q.event in [questid].js.
 
 
 	
