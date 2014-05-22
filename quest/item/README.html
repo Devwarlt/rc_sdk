@@ -1,51 +1,26 @@
 ####################################
 ITEM TEMPLATE:
 
-All the items related to a quest must start with [questId]-.
-Items that do not start with that will be renamed.
+q.item['ITEMID'] = s.item('NAME','ICON',[
+	['OPTION0-name',OPTION0-event,'OPTION0-description'],
+	['OPTION1-name',OPTION1-event,'OPTION1-description'],
+]);
 
-q.item['gold'] = {  	/* "gold" will be the item id*/
-	name:'Gold',				/*name of item*/
-	icon:'system.gold',			/*icon used check /client/js/img.js    */
-	stack:true,					/*only use 1 inventory slot*/
-	trade:true, 				/*can be traded	*/		
-	drop:true,					/*can be dropped*/
-	remove:false,				/*remove item when used*/
-	bank:true,					/*can be put in a bank*/
-	type:'item',				/*leave that way. do not touch*/
-	
-	option:[					/*option when right clicking*/
-		{
-			name:'Teleport',  				/*visible text for client*/
-			func:q.event.teleportPlayer			/*quest event*/
-		},
-		{
-			name:'Open Bank',
-			func:q.event.openBank
-		},
-		
-	]
-};
+###############
+Example:
 
-q.item['gold'] = {   	
-	name:'Gold',			
-	icon:'system.gold',	
-	stack:true,				
-	trade:true, 					
-	drop:true,				
-	remove:false,				
-	bank:true,				
-	type:'item',			
-	
-	option:[				
-		{
-			name:'Teleport',
-			func:q.event.teleportPlayer
-		},
-		{
-			name:'Open Bank',
-			func:q.event.openBank
-		},
-		
-	]
-};
+q.item['potion'] = s.item('Potion','heal.pot',[
+	['Drink',q.event.itemPotion,'Transform into an orc.'],
+]);
+
+q.item['potion_unf'] = s.item('Unfinished Potion','heal.pot',[
+	['Finish',q.event.itemPotionUnf,'Requires 1 mystical flower and 1 orc socks.'],
+]);
+
+q.item['flower'] = s.item('Mystical Flower','leaf.leaf');
+
+
+################
+Note: Quest items are untradable, unbankable, undropable, stackable, unsellable. They disappear automatically once quest complete.
+ 
+

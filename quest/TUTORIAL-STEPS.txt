@@ -1,0 +1,130 @@
+
+PREPARATION:
+-Read all the READMEs...
+-Download the full game engine and install the NodeJS server on your computer. Read /testing/README 
+-Make sure the game engine works fine without your quest. Read /testing/README 
+
+##### 
+Just to make things clear, those 2 projects are COMPLETLY separated:
+-SDK: Software development kit contains info about how to create stuff for the game. This is what you're reading atm.
+		Modify files in the SDK will not affect the game. The SDK cannot run the game.
+		https://github.com/RainingChain/rc_sdk
+		
+-GAME ENGINE: What the game needs to run: quest codes, map images, combat scripts etc...
+	https://github.com/RainingChain/rainingchain	(Downloaded in the preparation above)
+
+You create and test elements with the SDK. Once they are good, you move them to the game engine and test them again in the real game. 
+#####	
+
+Note: 
+[QUESTID] refers to the id of your quest.
+server refers to the game engine.
+command line refers to the terminal (aka black window that pops when you click on STARTSERVER.bat)
+
+
+#########################
+PRE-TEST: 
+Goal: Create a new "empty" quest. Once this will be done, we will add custom elements to the template.
+
+-Move the "quest template BASIC.js" file in /server/db/quest on the game engine.
+-Rename the file to the id of your quest. Ex: killDragon.js
+-Open file /server/Db_quest.js in game engine.
+-Add your quest id in the questList array.
+-Change Quest.test.name = '[QUESTID]';
+-Start server via STARTSERVER.bat
+-Go to http://localhost:3000/ and log in with username:sam, password:sam.
+-Upon logging, there should be a message saying: "You're currently working on the quest: [QUESTID]."
+
+Problems: 
+	ALWAYS CHECK THE COMMAND LINE FOR ERRORS. (Note: info - socketio message is normal)
+	
+	Can't access page: try starting again from scratch (remove quest from questList and Quest.test).
+						if works: problem with quest, read error
+						if doesn't work: problem with engine.
+	No message upon logging: Make sure quest is in the questList and Quest.test = [QUESTID]
+	
+If you have received the message, move on to next step :D
+	
+
+
+#########################
+DRAFT:
+
+-Dress the list of action the player must perform to complete the quest.
+-Dress the list of maps you will need to create/edit and what they will have.
+-Dress the list of main dialogues and npc.	
+
+#########################
+CODING IN MINIMIZED ENVIRONMENT (SDK):
+Note:	Main things refers to things essential for completing the quest.
+		Template refers to the file located in /server/db/quest that you renamed to [QUESTID].js. (Original name was quest template BASIC.js)
+
+In this step, you will use the SDK to verify that what you wrote is good.		
+		
+-Write down list of main quest events, what they do and how they will be triggered in the template.
+-Write the JS code for them with the functions found in quest/event/README.
+
+-Write down the main dialogues.
+-Test the dialogues via /quest/dialogue/test-dialogue.html
+
+-Copy-paste the dialogues in the template.
+-Test the quest via the /quest/event/test-event.html file.
+
+ONCE THE QUEST WORKS, you will move the real game engine.
+
+#########################
+CODING IN MID ENVIRONMENT (MINIMIZED GAME ENGINE):
+
+In this step, you will use a minimized game engine to verify that what you wrote is good:
+Difference with normal engine:
+-Monsters can't be attacked. Instead, they can be killed by right-clicking and selecting "Kill" instead. (To trigger deathFunc)
+-Challenge, highscore, requirements, chrono, etc... will do nothing.
+-There's only 1 map with everything in it. s.teleport will do nothing.
+	Instead of using the q.map or q.mapAddon, you will use q.minimizedMap which is a simplified version for maps.
+###
+
+-Open /server/Db_quest.js in game engine and make sure that Quest.test.minimized = true;
+-Code the items you will use and add them to the template. Check /quest/item
+
+-Code the q.minimizedMap in the template. Check /quest/map/minimizedMap.txt
+
+-Run the server and test the quest. You should be able to complete it at this point.
+
+#########################
+CODING IN REAL ENVIRONMENT (GAME ENGINE):
+
+-Create the maps using Tiled. Check /quest/map.	(This is a long process.)
+Don't forget that if you have created map images, create a new folder at server/client/img/map/[mapId] and place them there.
+-Code the q.map and q.mapAddon and put them in the template. You will use the real s.actor now.
+-Complete the quest.
+
+If still working, start working on completing all quest events for things like:
+-viewedIf
+-_hint
+-_abandon, _complete, etc...
+-No possible abuse.
+
+#########################
+POLISHING:
+-Add non-essential map decoration.
+-Add non-essential dialogue.
+-Add non-essential enemies.
+-Test the final version of the quest.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

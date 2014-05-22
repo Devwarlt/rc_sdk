@@ -1,27 +1,4 @@
 #### QUEST EVENT ####
-
-STEPS:
-
-1- Think of the quest events and write them down with their player action.
-2- Code the quest events with the functions below.
-3- Write the key dialogues.
-4- Test the quest via the test-event.html file.
-ONCE THE QUEST WORKS
-5- Create the key maps roughly.
-6- Add the intermediates.
-7- Create the key items.
-8- Test the quest via your nodejs server. (check quest/testing)
-ONCE THE QUEST WORKS
-9- Polish.
-	Add non-essential map decoration.
-	Add non-essential dialogue.
-	Add non-essential enemies.
-10- Test the final version of the quest.
-
-
-
-#####################
-FUNCTIONS:
 Those are the main functions you can use in your quest events. They all start by s.
 
 ###BASIC USAGE:###
@@ -56,9 +33,11 @@ Add regular text in Chat Box:
 Pop Quest Window:
 	s.startQuest(key);								Ex: 	s.startQuest(key);
 
+Complete Quest:
+	s.completeQuest(key);							Ex: 	s.completeQuest(key);	
 	
-	
-	
+Abandon Quest:
+	s.abandonQuest(key);							Ex: 	s.abandonQuest(key);		
 	
 	
 

@@ -62,9 +62,15 @@ require = function(){
 	var s = {};	
 	s.quest = Quest.template(Q);
 	s.startQuest = function(key){
-		s.set(key,'active',true);
+		s.set(key,'_active',true);
 	}
-	
+	s.completeQuest = function(key){
+		s.set(key,'_complete',true);
+		Quest.complete(key);
+	}
+	s.abandonQuest = function(key){
+		Chat.add(key,"Quest abandonned!");
+	}
 	s.interval = function(num){  }
 	s.get = function(key,attr){
 		var mq = List.main[key].quest[Q];		
@@ -75,12 +81,12 @@ require = function(){
 	s.set = function(key,attr,attr2,value){
 		var mq = List.main[key].quest[Q];	
 		
-		if(attr === 'active'){
+		if(attr === '_active'){
 			mq[attr] = true;
 			Chat.add(key,"You started the quest '" + s.quest.name + "'.");
 			return;
 		}	
-		if(!mq.active){
+		if(!mq._active){
 			Chat.add(key,"You need to start this quest via the Quest Tab before making progress in it."); 
 			return;
 		}

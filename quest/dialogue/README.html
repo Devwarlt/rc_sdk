@@ -27,6 +27,8 @@ Each node also has properties such as:
 	
 	event:	Quest Event to call when player accesses this dialogue.
 	
+	exit:	If player can exit the dialogue. (0 = can't exit)
+	
 ###
 Each face has the properties:
 	
@@ -56,7 +58,16 @@ General Template:
 q.dialogue['npcName'] = {
 	convo0:{
 		node0:{
-			...
+			text:"Hello, how are you?",
+			face:{image:'warrior-man.0',name:"Bob"},
+			option:[
+				{text:"Great.",
+					next:{npc:'npcName',convo:'convo0',node:'node1'},
+				},
+				{text:"Bad.",
+					next:{npc:'npcName',convo:'convo0',node:'node2'}
+				},
+			]
 		},
 		node1:{
 			...
@@ -129,11 +140,11 @@ Functions can also be directly linked with the node. Called when dialogue starts
 
 node0:{
 	text:"Hello, I found your ring.",
+	exit:0,
 	face:"player",
 	event:q.event.giveRing
 }
 
-ADVANCED: Make sure the q.dialogue is after the q.event in [questid].js.
 
 
 	

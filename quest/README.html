@@ -59,8 +59,8 @@ Actor are split in 2 categories:
 ##################
 QUEST CONCEPT:
 
-A quest is a serie of events the player must trigger and complete in order to achieve the .complete state.
-Each event is represented by a function, a part of code that modifies the player progression in the quest.
+A quest is a series of events the player must trigger.
+Each event is represented by a part of code that modifies the player progression in the quest.
 
 Each quest event needs to be linked with a player action. 
 It's via this player action that the player will trigger the event.
@@ -81,32 +81,10 @@ Examples:
 The same quest event may be linked with multiple player actions.
 
 All Quest events are in "q.event".  (Will be more clear later)
-
-############
-
-Player progression in a quest is saved in quest variables.
-Each quest variable has a unique name.
-Most quest events will access/modify those values.
-
-Example:
-
-custom quest variables list:
-	"haveKilledDragon" = false 		(default is false)
-
-Quest event #1: 
-	Set quest variable "haveKilledDragon" to true
-	When
-	Player Action: Kill dragon.
-		
-Quest event #2: 	
-	if quest variable "haveKilledDragon" is true	=> 	Receive reward and finish quest. 
-	if quest variable "haveKilledDragon" is false	=> 	Get nothing
-	When
-	Player Action: Talking with King.
-
-The Javascript coding syntax will be explained later in /quest/event.
 	
 ############
+MAPS:
+
 Maps contain the information about what actors to create. 
 Some of these actors (ex: switch, dragon) may or may not be used for a quest event.
 
@@ -121,22 +99,45 @@ Ex:
 
 Full list can be found in /map.
 
+############
+PROGRESSION:
+
+Player progression in a quest is saved in quest variables.
+Each quest variable has a unique name. Their value can be anything (number, boolean, string)
+Most quest events will access/modify those values.
+
+###
+Example:
+
+custom quest variables list:
+	"haveKilledDragon" = false
+
+Quest event #1: 
+	Set quest variable "haveKilledDragon" to true
+	When
+	Player Action: Kill dragon.
+		
+Quest event #2: 	
+	if quest variable "haveKilledDragon" is true	=> 	Receive reward and finish quest. 
+	if quest variable "haveKilledDragon" is false	=> 	Get nothing
+	When
+	Player Action: Talking with King.
+
+The Javascript coding syntax will be explained later in /quest/event.
 
 ############
+VARIABLES:
 
 Each account has multiple variables separated in two categories: player and quest.
 	Player contains the same variables than regular monsters/actors. (Ex: hp, speed, attack, defence)
-
+	Note: You shouldn't have to access those variables directly when making a quest.
+	
 	Quest contains quest variables which track the current progression of all quests for a specify player.
 	Each quest variable has an unique name. 
 
 Each account has a unique id called "key".
 In order for the game engine to know what account you want to access, you need to specify the "key" to use.
 The key is always passed as the first parameter in any quest event you will create.
-
-
-s.getAct(key) will access the player variables
-	Ex: s.getAct(key).hp 		refers to the hp of the player corresponding to the key
 
 s.get(key,'questVariableName') will access the quest variable	
 	Ex:	s.get(key,'haveKilledDragon')		refers to the value of the quest variable named "haveKilledDragon" for the player with this key

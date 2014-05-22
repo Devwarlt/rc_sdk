@@ -82,8 +82,8 @@ readFiles.script = function(e) {
 	Q = qt.id;
 	Db.dialogue[qt.id] = qt.dialogue;
 	Dialogue.init();
-	qt.variable.complete = 0;
-	qt.variable.active = 0;
+	qt.variable._complete = false;
+	qt.variable._active = true;
 	List.main.bob.quest[qt.id] = qt.variable;
 	
 	var str = '<br>Last Quest Event: <span id="lastEvent"></span>' ;
@@ -276,7 +276,7 @@ Dialogue.start = function(key,d){
 	var main = List.main[key];
 	main.dialogue = dia;
 	
-	if(dia.func) applyFunc.key(key,dia.func,[List.main[key].quest]);
+	if(dia.event) applyFunc.key(key,dia.event,[List.main[key].quest]);
 	}catch(err){
 		log("This dialogue doesn't exist : " + JSON.stringify(d));
 	}
@@ -290,7 +290,7 @@ Dialogue.end = function(key){
 }
 
 Dialogue.option = function(key,option){
-	if(option.func)	applyFunc.key(key,option.func,option.param);
+	if(option.event)	applyFunc.key(key,option.event);
 	
 	if(option.next){
 		Dialogue.start(key,option.next);
