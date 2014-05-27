@@ -72,6 +72,7 @@ require = function(){
 		Chat.add(key,"Quest abandonned!");
 	}
 	s.interval = function(num){  }
+	
 	s.get = function(key,attr){
 		var mq = List.main[key].quest[Q];		
 		var a = mq[attr];
@@ -103,6 +104,12 @@ require = function(){
 	s.setTimeOut = function(key,name,time,func){
 		
 	};
+	
+	s.teamForEach = function(key,func,action){
+		if(func(key)) action(key);
+	}
+	s.highscoreWindow = function(){}
+	s.usePreset = function(){}
 	
 	s.chat = Chat.add;
 	s.question = Chat.question;
@@ -209,14 +216,14 @@ require = function(){
 		
 	}
 
-
-
+	s.rechargeAbility = function(){}
+	s.chrono = function(){}
 	
 	//Template
 	
 	s.requirement = func;
 	s.challenge = func;
-	
+	s.item = func;
 	
 	
 	

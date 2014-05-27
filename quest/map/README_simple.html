@@ -17,20 +17,20 @@ In q.minimizedMap you can only use the following functions:
 
 #####
 Create a simplified actor:
-	m.minimized.actor('name',extra);			Ex: s.minimized.actor('Dragon',{deathFunc:q.event.killDragon});
+	m.actor.simple('name',extra);			Ex: m.actor('Dragon',{deathFunc:q.event.killDragon});
 
 Create a simplified loot (aka chest):
-	m.minimized.loot('name',viewedIf,open); 	Ex: s.minimized.loot('Jewel Chest',q.event.gotJewel,q.event.giveJewel);
+	m.loot.simple('name',viewedIf,open); 	Ex: m.loot('Jewel Chest',q.event.gotJewel,q.event.giveJewel);
 
 Create a simplified loot (aka chest):
-	m.minimized.loot('name',viewedIf,on,off); 	Ex: s.minimized.loot('Door Switch',q.event.doorIsLocked,q.event.unlockDoor,q.event.lockDoor);
+	m.toggle.simple('name',viewedIf,on,off); 	Ex: m.toggle('Door Switch',q.event.doorIsLocked,q.event.unlockDoor,q.event.lockDoor);
 #####	
 
 q.minimizedMap = function(){
 	//create these actors when creating/loading the map
 	
-	s.minimized.actor('Dragon',{deathFunc:q.event.killDragon});
-	s.minimized.loot('Jewel Chest',q.event.gotJewel,q.event.giveJewel);
-	s.minimized.loot('Door Switch',q.event.doorIsLocked,q.event.unlockDoor,q.event.lockDoor);
+	m.actor.simple('Dragon',{deathFunc:q.event.killDragon});
+	m.loot.simple('Jewel Chest',q.event.gotJewel,q.event.giveJewel);
+	m.toggle.simple('Door Switch',q.event.doorIsLocked,q.event.unlockDoor,q.event.lockDoor);
 }
 

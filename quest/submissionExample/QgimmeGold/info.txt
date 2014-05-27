@@ -1,0 +1,5 @@
+Quest created by rc on 2014-05-26.
+
+Possible additions/improvement:
+-Puzzle for the chest
+-Turn the dragon into an actual boss.

@@ -58,15 +58,14 @@ q.event.teleportDragonLair = function(key){
 ADVANCED:
 
 Teleport:
-	s.teleport(key,'mapId','spotLetter',popup);
-		if mapId has no @ 		=>	main instance 
-		if mapId ends with @ 	=> 	team instance
-		if mapId ends with @@	=>	solo instance
-
+	s.teleport(key,'mapId','spotLetter','instance',newmap);
+		instance can be:	''			=> main instance, everybody is in same map
+							'solo'		=> private instance, generate 1 map per player
+							'team'		=> player in same team will be teleported to same instance
+		
 		spotLetter: only have access to the spots that are part of a map addon related to the quest
 
-		popup = 0	=> teleport player instantly	(default)
-		popup = 1 	=> popup a confirmation box. player can also choose the instance they want
+		newmap BOOLEAN		true => destroy old map instance and create a new one.
 
 
 Items Other formats:
@@ -168,7 +167,9 @@ Naming Convention:
 	
 	ViewedIf:	view[What]
 		Ex: viewChest, viewBoss
-	
+		
+	Loot:	loot[What]
+		Ex: lootChest
 	
 	###########
 	VARIABLES:	

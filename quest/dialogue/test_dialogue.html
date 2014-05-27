@@ -29,7 +29,7 @@ div{	white-space:nowrap;		draggable:false;	readonly:readonly;	disabled:disabled;
 <script>
 var func = function(){};
 log = function(txt){ document.getElementById('log').innerHTML += txt + '<br>'; }
-require = function(){ return {init:function(){ return {quest:Quest.template(),challenge:func,requirement:func,
+require = function(){ return {init:function(){ return {quest:Quest.template(),challenge:func,requirement:func,item:func,
 }}}};
  
 html = {dialogue:{div:document.getElementById('dialogueBoxDiv'),text:document.getElementById('dialogueBoxText'),exit:document.getElementById('dialogueBoxExit')}};
@@ -67,8 +67,7 @@ readFiles.script = function(e) {
 		var str = e.target.result;
 		str = str.replace('use strict','');
 		str = str.replace('var q','q');
-		g= str;
-		var content = eval(str); 
+		eval(str); 
 	} catch(err){
 		log('Problem with file ' + name + '. Check template to make sure everything fits. Special attention to commas and quotes. <br>' + err + '<br>' + err.stack);
 	}
@@ -271,7 +270,7 @@ Dialogue.option = function(key,option){
 }
 
 Dialogue.init = function(){
-	
+	console.log(Db.dialogue);
 	for(var i in Db.dialogue){
 		var group = Db.dialogue[i];
 		

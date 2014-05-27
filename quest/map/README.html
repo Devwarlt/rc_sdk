@@ -54,9 +54,9 @@ Create Actor: (Enemy, Npc, Switch, Block, Cuttable Trees, Doors)
 		"red",			//variant: 	
 		{},				//extra:	enemy exactly the same than the template since extra is empty
 	);
+	m.actor(spot.c,"goblin","red",extra);
 	
-	
-	m.actor(		
+	m.actor(
 		spot.c,				
 		"goblin",		
 		"red",
@@ -69,26 +69,6 @@ Create Actor: (Enemy, Npc, Switch, Block, Cuttable Trees, Doors)
 	
 	In other to create a enemy that can respawn, the enemy needs to be in a group. Note: The group be be only 1 enemy.
 	
-	m.actorGroup(			//create a group of monsters that respawns
-		{
-			'xym':spot.a,	
-			'respawn':100			
-		},
-		[
-			{							//first enemy type of the subgroup
-				'amount':3,					//amount
-				"category":"troll",			//enemy category
-				"variant":"ice",			//enemy variant
-				"extra":{},					//extra is applied to every monster of this type in that subgroup
-			},
-			{							//second enemy type of the subgroup
-				'amount':2,
-				"category":"troll",
-				"variant":"fire",
-				"extra":{},	
-			},		
-		]
-	);
 	m.actorGroup(
 		spot.e1,		//spot
 		25*15,			//amount of frames before enemy group respawns (timer starts when last member is dead)
@@ -103,6 +83,10 @@ Create Actor: (Enemy, Npc, Switch, Block, Cuttable Trees, Doors)
 			["orc","magic",5,{deathEvent:q.event.killOrc}],		//other subgroup
 		]	
 	);	
+	m.actorGroup(spot.e2,25*15,[
+		["orc","melee",1,{}],
+		["orc","range",1,{}]
+	]);	
 	
 	
 	#####################
@@ -159,7 +143,18 @@ Create Actor: (Enemy, Npc, Switch, Block, Cuttable Trees, Doors)
 	
 	
 	
-
+	####
+	Name
+		Display name while moving mouse over the NPC.
+		
+		name:"Bob",
+	
+	####
+	Sprite Name
+		Change the look of a NPC
+		
+		"sprite,name":"villager-male1",
+		
 	####
 	Combat?
 		is the enemy in combat? being in combat means that he can perform attacks, be attacked and if its a monster, it can target/follow a player
@@ -172,6 +167,8 @@ Create Actor: (Enemy, Npc, Switch, Block, Cuttable Trees, Doors)
 		
 		move:false,
 	
+
+
 		
 	ADVANCED: For the full list of actor extra (not-related to quest), check /server/Actor.init.js
 	
@@ -185,7 +182,10 @@ Create Actor: (Enemy, Npc, Switch, Block, Cuttable Trees, Doors)
 		q.event.myCondition,	//viewedIf	(put null if no condition)
 		'spike',				//sprite name (default is 'spike')
 		{},						//extra
-	)
+	);
+	
+	m.block(spot.b1,q.event.myCondition,'spike',{});
+	
 	####################
 	Create a teleport:	(Door, Teleport Zone, staircase)
 		Call quest event when player use the teleport option of this actor.
@@ -196,7 +196,7 @@ Create Actor: (Enemy, Npc, Switch, Block, Cuttable Trees, Doors)
 		'zone',							//appearance ('zone','door','underground')
 		{},								//extra	(ex: viewedIf)
 	);
-	
+	m.teleport(spot.b1,q.event.teleportEvent,'zone',extra);
 				
 	//An example of what the quest event could be:
 	q.event.teleportEvent = function(key,e,map){
@@ -222,6 +222,7 @@ Create Actor: (Enemy, Npc, Switch, Block, Cuttable Trees, Doors)
 		{},								//extra for offSwitch
 		{}								//extra for onSwitch
 	);
+	m.toggle(spot.b1,q.event.displayOffCondition,q.event.turnOn,q.event.turnOff,extraoffSwitch,extraonSwitch);
 	
 	//putting null for the "q.event.turnOff" means the switch can only be activated once
 				
@@ -249,6 +250,7 @@ Create Actor: (Enemy, Npc, Switch, Block, Cuttable Trees, Doors)
 		{},							//extra for chestOff
 		{}							//extra for chestOn
 	);
+	m.loot(spot.b1,q.event.displayUnopened,q.event.openChest,'chest',extrachestOff,extrachestOn);
 	
 	//An example of what the quest event could be:
 	q.event.openChest = function(key){
