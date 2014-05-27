@@ -1,6 +1,3 @@
-
-
-
 Chat = {};
 Chat.add = function(key,text){ log(text);}
 Chat.question
