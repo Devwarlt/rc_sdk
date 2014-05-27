@@ -1,4 +1,6 @@
-var q = Quest.template('Qtestdialogue','v1.1');
+"use strict";
+var s = require('./../Quest_exports').init('v1.0','QgimmeGold');
+var q = s.quest; var m = s.map; var b = s.boss;
 
 q.variable = {
 	'talk':0,
@@ -8,24 +10,27 @@ q.variable = {
 
 q.event = {
 	dialogue1:function(key){
-		if(get(key,'talk') === 0) 
-			dialogue(key,'jenny','intro','first');
-		else if(get(key,'talk') === 1 && get(key,'killedDragon') === 0) 
-			dialogue(key,'jenny','intro','second');
+		if(s.get(key,'talk') === 0) 
+			s.dialogue(key,'jenny','intro','first');
+		else if(s.get(key,'talk') === 1 && s.get(key,'killedDragon') === 0) 
+			s.dialogue(key,'jenny','intro','second');
 		else 
-			dialogue(key,'jenny','intro','gratz');
+			s.dialogue(key,'jenny','intro','gratz');
 	},	
 	killedDragon:function(key){
-		set(key,'killedDragon',1);
+		s.chat(key,'You have killed the dragon!');
+		s.set(key,'killedDragon',1);
 	},
 	giveGold:function(key){
-		if(get(key,'haveReceivedGold') === 0){
-			addItem(key,'gold',10);
-			set(key,'haveReceivedGold',1);
+		if(s.get(key,'haveReceivedGold') === 0){
+			s.addItem(key,'gold',10);
+			s.set(key,'haveReceivedGold',1);
+		} else {
+			s.chat(key,'You already got your reward.');		
 		}
 	},
 	setTalk:function(key){
-		set(key,'talk',1);
+		s.set(key,'talk',1);
 	}
 };
 
@@ -33,14 +38,14 @@ q.dialogue['jenny'] = {'face':{'image':'warrior-male.0','name':'Jenny'},
 	'intro':{
 		'first':{
 			'text':"Go kill dragon.",
-			'func':q.event.setTalk,
+			'event':q.event.setTalk,
 		},
 		'second':{
 			'text':"What you waiting for.",
 		},	
 		'gratz':{
 			'text':"Congratz!",
-			'func':q.event.giveGold,
+			'event':q.event.giveGold,
 		},	
 	}
 };

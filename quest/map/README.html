@@ -36,7 +36,7 @@ There's a 4th attribute .variable that can contain any type of variable. Access 
 ####
 .loop Function(spot)	
 	This function will be called every frame (25 times per second).
-	Used for: Test collision that will trigger another event. Ex: Teleport Zone. 
+	Used for: Test collision that will trigger another event. Ex: Cutscene
 	
 ######################
 LOAD:
@@ -45,6 +45,7 @@ Create Actor: (Enemy, Npc, Switch, Block, Cuttable Trees, Doors)
 	All actors have a specific template. When creating an actor, you need to specify the template to use.
 	Each template has an id with 2 components: category and variant.
 	
+	List of template found in game engine in Link To Npc-Enemy
 	In order to create an enemy that has different attribute than the template, you need to specify the differences in the "extra" parameter.
 	
 	## Basic Examples ##
@@ -65,7 +66,6 @@ Create Actor: (Enemy, Npc, Switch, Block, Cuttable Trees, Doors)
 			maxSpd:0.001,
 		},					
 	);
-	
 	
 	In other to create a enemy that can respawn, the enemy needs to be in a group. Note: The group be be only 1 enemy.
 	
@@ -134,7 +134,7 @@ Create Actor: (Enemy, Npc, Switch, Block, Cuttable Trees, Doors)
 		
 		//An example of what the quest event could be:
 		q.event.canSeeRock = function(key,eid){
-			if(s.get(key,'brokeRock') === true){
+			if(s.get(key,'destroyedRock') === true){
 				return false;
 			} else {
 				return true;
@@ -243,7 +243,7 @@ Create Actor: (Enemy, Npc, Switch, Block, Cuttable Trees, Doors)
 		
 	
 	m.loot(
-		spot.b1,						//spot
+		spot.b1,					//spot
 		q.event.displayUnopened,	//event that RETURN BOOLEAN. if true, display the unopened chest
 		q.event.openChest,			//event called when opening the chest		(PARAM: key | e: chest being opened object)
 		'chest',					//appearance
@@ -279,11 +279,10 @@ LOOP COMMON FUNCTIONS
 Call Quest Event if player is in a zone:
 	If a player is in that zone, call a quest event.
 	
-	PARAM: 	0: spot zone. (should have been made with multiple letters in Tiled)
-			1: quest event to call
-	
-	ex:
-	m.collision(spot.a,q.event.spawnEnemy);
+	m.collision(
+		spot.a,					//spot zone. (should have been made with multiple letters in Tiled)
+		q.event.damagePlayer		//quest event to call if in zone
+	);
 	
 	//An example of what the quest event could be:
 	q.event.damagePlayer = function(key){
@@ -294,7 +293,7 @@ Call Quest Event if player is in a zone:
 	
 	
 Everything in the loop function will be called every frame. 
-However, for performance reasons, it is advised to use s.interval
+However, for performance reasons, it is advised to use s.interval.
 
 	s.interval(time)   return true every [time] frames.
 	
@@ -303,7 +302,7 @@ if(s.interval(100)){		//do something... every 100 frames (every 4 seconds)
 	something...
 }
 	
-	
+Note: No need to use s.interval for m.collision.
 	
 	
 	

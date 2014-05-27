@@ -80,7 +80,7 @@ Items Other formats:
 		
 		
 		
-Prevent player from moving (# of frames) (Server = 25 FPS) Done done, call the event. :
+Prevent player from moving (# of frames) (Server = 25 FPS) Once done, call the event. :
 	s.freeze(key,time,event);					Ex: 	s.freeze(key,25*10,q.event.cutsceneDone);
 
 Allow a frozen player to move again:
@@ -144,8 +144,8 @@ Items:
 Naming Convention:
 	EVENTS:
 	
-	Teleport:	tele[In or Out][Where]
-		Ex: teleInCamp, teleOutLair
+	Teleport:	tele[Old Map][New Map]
+		Ex: teleTownHouse, teleHouseTown
 	
 	Cutscene:	cs[In or Out or Test][Info]
 		Ex: csInBoss, csOutVillage, csTest
