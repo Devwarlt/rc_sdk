@@ -414,6 +414,8 @@ if %W% gtr 5120 if %H% gtr 2880 convert %id%B.png -crop 640x360+5120+2880 %id%/%
 if %W% gtr 5120 if %H% gtr 2880  extraANDlinux\pngquant.exe --ext .png --force 256 %id%/%id%A_(8,8).png
 if %W% gtr 5120 if %H% gtr 2880  extraANDlinux\pngquant.exe --ext .png --force 256 %id%/%id%B_(8,8).png
 
+del %id%A.png
+del %id%B.png
 explorer C:\rc\rainingchain\server\client\img\map
 
 EXIT

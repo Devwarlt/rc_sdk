@@ -1,0 +1,123 @@
+Load the map to know what spots you haven't used yet.<br>
+<br>
+Select the .json file (Not the .tmx file)<br>
+<br>
+This will show the UNUSED spots. It only checks the SPOT layer. No need to refresh page, just load the file again to update.
+<div id="log"></div>
+
+<input type="file" class="upload" onchange="readFiles(this.files)" onclick="this.value='';" multiple="" /><br>
+<textarea id="textarea" rows="15" cols="100"></textarea>
+<div id="show"></div>
+<script>
+log = function(txt){ document.getElementById('log').innerHTML += txt + '<br>'; }
+  
+
+String.prototype.replaceAll = function (find, replace) {
+    var str = this;
+    return str.replace(new RegExp(find, 'g'), replace);
+};
+
+String.prototype.numberOnly = function(num){
+	var sign = this[0] === '-';
+	var a = this.replace(/[^\d.]/g, "");
+	if(sign) a = '-' + a;
+	if(num){ a = +a; }
+	return a;
+}
+String.prototype.capitalize = function() {
+	return this.charAt(0).toUpperCase() + this.slice(1);
+}
+
+
+readFiles = function(files) {
+	for (var i in files) { //for multiple files          
+		(function(file) {
+			var reader = new FileReader();  
+
+			reader.fileName = file.name;
+			reader.onload = readFiles.script;
+			reader.readAsText(file, "UTF-8");
+
+
+		})(files[i]);
+	}
+}
+
+
+
+readFiles.script = function(e) {  
+	name = this.fileName.slice(0,this.fileName.indexOf('.'));
+	content = JSON.parse(e.target.result); 	
+
+	version = content.tilesets[0].image.slice(-10).slice(0,4);	//assumes tileset name is 1 digit
+	convertChart = convertChartAll[version];
+
+	//get height
+	height = content.height;
+	width = content.width;
+
+	for(var i in content.layers)
+		if(content.layers[i].name === 'SPOT')
+			var spot = content.layers[i].data;
+
+
+	for(var i in spot)
+		delete convertChart[spot[i]];
+
+	for(var i in convertChart)
+		if(convertChart[i].length > 2 || convertChart[i] === '1'|| convertChart[i] === '2'|| convertChart[i] === '3'|| convertChart[i] === '4') delete convertChart[i];
+
+	var tmp = [];
+	for(var i in convertChart) tmp.push(convertChart[i]);
+
+	var t = {misc:[],e:[],n:[],t:[],b:[],q:[],g:[],s:[]};
+	for(var i in tmp){
+		if(tmp[i].length === 1) t.misc.push(tmp[i]);
+		else {
+			t[tmp[i][0]].push(tmp[i]);
+		}
+	}
+	var str = '';
+	for(var i in t)
+		str += t[i] + '\n';
+	document.getElementById('textarea').value = str;	
+}
+
+
+convertChartAll = {
+	'v1.2':{
+		'20001':'1',	//collision actor + bullet
+		'20051':'2',	//collision actor
+		'20011':'3',	//collision fall close
+		'20061':'4',	//collision fall
+
+		'20101':'a','20102':'b','20103':'c','20104':'d','20105':'e','20106':'f','20107':'g','20108':'h',
+		'20151':'i','20152':'j','20153':'k','20154':'l','20155':'m','20156':'n','20157':'o','20158':'p',
+		'20201':'q','20202':'r','20203':'s','20204':'t','20205':'u','20206':'v','20207':'w','20208':'x',
+		'20251':'A','20252':'B','20253':'C','20254':'D','20255':'E','20256':'F','20257':'G','20258':'H',
+		'20301':'I','20302':'J','20303':'K','20304':'L','20305':'M','20306':'N','20307':'O','20308':'P',
+		'20351':'Q','20352':'R','20353':'S','20354':'T','20355':'U','20356':'V','20357':'W','20358':'X',
+
+		'20401':'e1','20402':'e2','20403':'e3','20404':'e4','20405':'e5','20406':'e6','20407':'e7','20408':'e8',
+		'20451':'ea','20452':'eb','20453':'ec','20454':'ed','20455':'ee','20456':'ef','20457':'eg','20458':'eh',
+		'20501':'ei','20502':'ej','20503':'ek','20504':'el','20505':'em','20506':'en','20507':'eo','20508':'ep',
+		'20551':'eq','20552':'er','20553':'es','20554':'et','20555':'eu','20556':'ev','20557':'ew','20558':'ex',		
+
+		'20601':'n1','20602':'n2','20603':'n3','20604':'n4','20605':'n5','20606':'n6','20607':'n7','20608':'n8',
+		'20651':'t1','20652':'t2','20653':'t3','20654':'t4','20655':'t5','20656':'t6','20657':'t7','20658':'t8',
+		'20701':'g1','20702':'g2','20703':'g3','20704':'g4','20705':'g5','20706':'g6','20707':'g7','20708':'g8',
+		'20751':'q1','20752':'q2','20753':'q3','20754':'q4','20755':'q5','20756':'q6','20757':'q7','20758':'q8',
+		'20801':'b1','20802':'b2','20803':'b3','20804':'b4','20805':'b5','20806':'b6','20807':'b7','20808':'b8',
+		'20851':'s1','20852':'s2','20853':'s3','20854':'s4','20855':'s5','20856':'s6','20857':'s7','20858':'s8',
+
+		'20111':'blue,0','20112':'blue,1','20113':'blue,2','20114':'blue,3','20115':'blue,4','20116':'blue,5','20117':'blue,6','20118':'blue,7','20119':'blue,8','20120':'blue,9','20121':'blue,10','20122':'blue,11','20123':'blue,12','20124':'blue,13','20125':'blue,14','20126':'blue,15','20127':'blue,16','20128':'blue,17','20129':'blue,18','20130':'blue,19','20131':'blue,20','20132':'blue,21','20133':'blue,22','20134':'blue,23',
+		'20161':'red,0','20162':'red,1','20163':'red,2','20164':'red,3','20165':'red,4','20166':'red,5','20167':'red,6','20168':'red,7','20169':'red,8','20170':'red,9','20171':'red,10','20172':'red,11','20173':'red,12','20174':'red,13','20175':'red,14','20176':'red,15','20177':'red,16','20178':'red,17','20179':'red,18','20180':'red,19','20181':'red,20','20182':'red,21','20183':'red,22','20184':'red,23',
+		'20211':'yellow,0','20212':'yellow,1','20213':'yellow,2','20214':'yellow,3','20215':'yellow,4','20216':'yellow,5','20217':'yellow,6','20218':'yellow,7','20219':'yellow,8','20220':'yellow,9','20221':'yellow,10','20222':'yellow,11','20223':'yellow,12','20224':'yellow,13','20225':'yellow,14','20226':'yellow,15','20227':'yellow,16','20228':'yellow,17','20229':'yellow,18','20230':'yellow,19','20231':'yellow,20','20232':'yellow,21','20233':'yellow,22','20234':'yellow,23',
+		'20261':'green,0','20262':'green,1','20263':'green,2','20264':'green,3','20265':'green,4','20266':'green,5','20267':'green,6','20268':'green,7','20269':'green,8','20270':'green,9','20271':'green,10','20272':'green,11','20273':'green,12','20274':'green,13','20275':'green,14','20276':'green,15','20277':'green,16','20278':'green,17','20279':'green,18','20280':'green,19','20281':'green,20','20282':'green,21','20283':'green,22','20284':'green,23',
+		'20311':'orange,0','20312':'orange,1','20313':'orange,2','20314':'orange,3','20315':'orange,4','20316':'orange,5','20317':'orange,6','20318':'orange,7','20319':'orange,8','20320':'orange,9','20321':'orange,10','20322':'orange,11','20323':'orange,12','20324':'orange,13','20325':'orange,14','20326':'orange,15','20327':'orange,16','20328':'orange,17','20329':'orange,18','20330':'orange,19','20331':'orange,20','20332':'orange,21','20333':'orange,22','20334':'orange,23',
+		'20361':'pink,0','20362':'pink,1','20363':'pink,2','20364':'pink,3','20365':'pink,4','20366':'pink,5','20367':'pink,6','20368':'pink,7','20369':'pink,8','20370':'pink,9','20371':'pink,10','20372':'pink,11','20373':'pink,12','20374':'pink,13','20375':'pink,14','20376':'pink,15','20377':'pink,16','20378':'pink,17','20379':'pink,18','20380':'pink,19','20381':'pink,20','20382':'pink,21','20383':'pink,22','20384':'pink,23',
+	}
+}
+
+
+</script>

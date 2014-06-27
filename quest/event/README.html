@@ -22,7 +22,7 @@ Test if enough inventory space for items (return boolean):
 	s.testItem(key,'itemId',amount);					Ex:		if(s.testItem(key,'gold',5)){ ... };	
 	
 Teleport a player:
-	s.teleport(key,'mapId','spotLetter');	Ex:		s.teleport(key,'dragonLair','a');
+	s.teleport(key,'mapId','spotLetter');			Ex:		s.teleport(key,'dragonLair','a');
 	
 Start a dialogue:
 	s.dialogue(key,'npcId','convoId','nodeId');		Ex:		s.dialogue(key,'villager','giveQuest','intro');
@@ -58,27 +58,13 @@ q.event.teleportDragonLair = function(key){
 ADVANCED:
 
 Teleport:
-	s.teleport(key,'mapId','spotLetter','instance',newmap);
+	s.teleport(key,'mapId','spotLetter','instance');
 		instance can be:	''			=> main instance, everybody is in same map
 							'solo'		=> private instance, generate 1 map per player
 							'team'		=> player in same team will be teleported to same instance
 		
 		spotLetter: only have access to the spots that are part of a map addon related to the quest
 
-		newmap BOOLEAN		true => destroy old map instance and create a new one.
-
-
-Items Other formats:
-	s.addItem(key,{firstItem:1,otherItem:3});
-	s.removeItem(key,{firstItem:1,otherItem:3});
-	
-	s.haveItem(key,{firstItem:1,otherItem:3});
-	s.testItem(key,{firstItem:1,otherItem:3});
-
-	s.haveItem(key,{firstItem:1,otherItem:3},true);	//true => if have the items, remove the items and return true
-	s.testItem(key,{firstItem:1,otherItem:3},true);	//true => if enough space for items, add the items and return true
-		
-		
 		
 Prevent player from moving (# of frames) (Server = 25 FPS) Once done, call the event. :
 	s.freeze(key,time,event);					Ex: 	s.freeze(key,25*10,q.event.cutsceneDone);
@@ -86,9 +72,6 @@ Prevent player from moving (# of frames) (Server = 25 FPS) Once done, call the e
 Allow a frozen player to move again:
 	s.unfreeze(key);								Ex: 	s.unfreeze(key);
 
-Get Player Object:
-	s.getAct(key);									Ex: 	s.getAct(key).hp += 100;
-	
 Change Player Sprite:
 	s.setSprite(key,name,sizeMod);					Ex:		s.setSprite(key,'orc-melee',2);
 
@@ -96,21 +79,10 @@ Call Event in Future:
 	s.setTimeout(key,name,time,event);				Ex: 	s.setTimeout(key,'cutsceneEnd',25*10,q.event.csOutBoss);
 
 Boost an actor:
-	s.boost(key,boost);								Ex:		s.boost(key,[{'stat':'globalDef','type':"*",'value':10,'time':250,'name':'bossPhase2'}]);
+	s.boost(key,name,stat,value,time);				Ex:		s.boost(key,'myBoost','globalDef',10,25*30);
 
-Start a cutscene (aka following a path)
-	s.cutscene(key,map,path);						Ex:		s.cutscene(key,'goblinLand','blue');
-	
-Get Npc (return first npc in the map with this tag (set via extra))	
-	s.getNpc(key,tag);								Ex:		s.getNpc(key,'boss');	
-	
 Set Respawn (isSafe: will teleport there even if map no longer exist):
-	s.setRespawn(key,map,letter,isSafe);			Ex:		s.setRespawn(key,'goblinLand','n1',false);
-	
-Call function for everyone in same team:
-	s.teamForEach(key,testEvent,eventAction);		Ex: 	s.teamForEach(key,q.event.haveKilledBoss,q.event.teleportOutsideOfBossRoom);
-	
-	if testEvent is true for every player in team, it calls eventAction for every player.
+	s.setRespawn(key,map,letter);					Ex:		s.setRespawn(key,'goblinLand','n1');
 	
 Opens Highscore Window:
 	s.highscoreWindow(key,category);				Ex: 	s.highscoreWindow(key,'fastest-time');
@@ -129,15 +101,13 @@ Special quest event names: (PARAM KEY)
 	_signIn:		event called automatically when player signs in after logging out
 	_complete:		event called automatically when successfully completing a quest	
 	_hint:			RETURN STRING, event that returns what is the current hint
+	_getScoreMod:	RETURN NUMBER, event that returns a global modifier for the passive score obtained from this quest.
 	
 		
 	//for testing (need to set Quest.test = [YOURQUESTID])
-	_test:{
-		signIn:			event called when logging in	(ex: teleport next to npc that gives quest)
-		firstSignIn:	event called when logging in for first time
-	}
-	
-	_getScoreMod:		RETURN NUMBER, event that returns a global modifier for the passive score obtained from this quest.
+	_testSignIn:			event called when logging in	(ex: teleport next to npc that gives quest)
+	_testFirstSignIn:		event called when logging in for first time
+
 	
 	
 Items:
