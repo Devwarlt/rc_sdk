@@ -73,10 +73,12 @@ readFiles = function(files) {
 readFiles.script = function(e) {  
 	var name = this.fileName.slice(0,this.fileName.indexOf('.'));
 	try {	
-		g = e.target.result.replace('use strict','').replace('var q','q').replace('var s','s');
+		g = e.target.result.replace('\"use strict\";','').replace('var q','q').replace('var s','s');
+		
+		console.log(g);
 		var content = eval(g); 
 	} catch(err){
-		log('Problem with file ' + name + '. Check template to make sure everything fits. Special attention to commas and quotes.<br>' + err.stack);
+		return log('Problem with file ' + name + '. Check template to make sure everything fits. Special attention to commas and quotes.<br>' + err.stack);
 	}
 	qt = q;
 	Q = qt.id;

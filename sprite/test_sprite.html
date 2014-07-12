@@ -383,14 +383,15 @@ readFiles.image = function(e) {
 
 readFiles.script = function(e) {  
 	var name = this.fileName.slice(0,this.fileName.indexOf('.'));
-	try {	var content = JSON.parse(e.target.result); 
+	try {	eval('content = ' + e.target.result); 
 	} catch(err){
 		log('Problem with file ' + name + '. Check template to make sure everything fits. Special attention to commas and quotes.');
 	}
 
 	if(name === 'code'){
+		console.log(e.target.result);
 		rawSprite = deepClone(content);
-		initSprite(content);
+		initSprite(rawSprite);
 		Test();
 	}
 }

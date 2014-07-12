@@ -1,32 +1,22 @@
 {
-	"id":"newMain",
-	"src":"actor/newMain.png",	
-	"size":2.5,
+	"id":"squirrel",
+	"src":"actor/squirrel.png",	
+	"size":2,
 	"side":[1,2,3,0],
-	"hpBar":-17,
-	"legs":20,
-	"preHitBox":[ -10,10,-10,17],
-	"preBumperBox":[ -10,10,-10,17],
+	"hpBar":-12,
+	"legs":12,
+	"preHitBox":[ -12,12,-12,12],
+	"preBumperBox":[ -12,12,-12,12],
 	"anim": {
 		"walk":{
 			"startY":0,
-			"frame":4,
+			"frame":3,
 			"sizeX":24,
-			"sizeY":32,
+			"sizeY":24,
 			"dir":4,
 			"spd":0.4,
 			"walk":true,
 			"next":"walk"
 		},
-		"attack":{
-			"startY":0,
-			"frame":4,
-			"sizeX":24,
-			"sizeY":32,
-			"dir":4,
-			"spd":0.4,
-			"walk":false,
-			"next":"walk"
-		}
     }
 }
